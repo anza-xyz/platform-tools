@@ -1,4 +1,4 @@
-# Customized Ruyst binaries for Solana that support Berkley Packer Filter (BPF)
+# Customized Rust binaries for Solana that support Berkley Packer Filter (BPF)
 
 Builds Rust binaries that incorporate customizations and fixes required
 by Solana but not yet upstreamed into Rust or LLVM.
