@@ -1,5 +1,7 @@
 # Customized Rust binaries for Solana that support Berkley Packer Filter (BPF)
 
+[![Build Status](https://travis-ci.org/solana-labs/rust-bpf-builder.svg?branch=master)](https://travis-ci.org/solana-labs/rust-bpf-builder)
+
 Builds Rust binaries that incorporate customizations and fixes required
 by Solana but not yet upstreamed into Rust or LLVM.
 
