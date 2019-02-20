@@ -1,0 +1,11 @@
+sudo: required
+language: c
+os: linux
+compiler: gcc
+services: docker
+
+notifications:
+  email: false
+
+script:
+  - ./shellcheck.sh
