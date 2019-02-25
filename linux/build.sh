@@ -3,8 +3,8 @@ set -ex
 
 cd "$(dirname "$0")"
 
-# docker build --no-cache -t solanalabs/rust-bpf .
-docker build -t solanalabs/rust-bpf .
+docker build --no-cache -t solanalabs/rust-bpf .
+# docker build -t solanalabs/rust-bpf .
 
 rm -rf out
 mkdir -p out
