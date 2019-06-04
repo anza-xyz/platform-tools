@@ -16,7 +16,10 @@ docker cp "$id":/usr/local/version.md deploy
 docker cp "$id":/usr/local/bin deploy
 docker cp "$id":/usr/local/lib deploy
 docker rm -v "$id"
+
+# Needed by xargo
 mkdir deploy/lib/rustlib/x86_64-unknown-linux-gnu/bin
+
 tar -C deploy -jcf solana-rust-bpf-linux.tar.bz2 .
 
 # docker push solanalabs/rust-bpf
