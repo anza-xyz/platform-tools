@@ -1,7 +1,7 @@
 # This docker file is based on the llvm docker file example located here:
 # https://github.com/llvm-mirror/llvm/blob/master/utils/docker/debian8/Dockerfile
 
-FROM launcher.gcr.io/google/debian8:latest as builder
+FROM launcher.gcr.io/google/debian9:latest as builder
 LABEL maintainer "Solana Maintainers"
 
 # Import public key required for verifying signature of cmake download.
