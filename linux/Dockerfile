@@ -55,7 +55,7 @@ RUN mkdir /tmp/cmake-install && cd /tmp/cmake-install && \
 # ADD scripts /tmp/scripts
 
 # Checkout the source code
-RUN git clone https://github.com/solana-labs/rust.git && \
+RUN git clone --single-branch --branch solana-1.39 https://github.com/solana-labs/rust.git && \
     echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
 
 RUN cd rust && \

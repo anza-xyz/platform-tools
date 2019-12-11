@@ -7,7 +7,7 @@ rm -rf out
 mkdir -p out
 cd out
 
-git clone https://github.com/solana-labs/rust.git
+git clone --single-branch --branch solana-1.39 https://github.com/solana-labs/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
 
 pushd rust
