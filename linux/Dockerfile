@@ -27,8 +27,12 @@ RUN apt-get update && \
                     gcc \
                     g++ \
                     clang \
-                    ssh && \
-    rm -rf /var/lib/apt/lists/*
+                    ssh \
+                    openssl \
+                    libssl-dev && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get update && \
+    apt-get install -y pkg-config
 
 # Install a newer ninja release. It seems the older version in the debian repos
 # randomly crashes when compiling llvm.
@@ -51,21 +55,34 @@ RUN mkdir /tmp/cmake-install && cd /tmp/cmake-install && \
     cd / && \
     rm -rf /tmp/cmake-install
 
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+RUN cargo --version
+
 # ADD checksums /tmp/checksums
 # ADD scripts /tmp/scripts
 
 # Checkout the source code
 RUN git clone --single-branch --branch solana-1.39 https://github.com/solana-labs/rust.git && \
-    echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
+    echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> ../rust_version.md
+RUN git clone --single-branch --branch rust-1.39.0 https://github.com/rust-lang/cargo.git && \
+    echo "$( cd cargo && git rev-parse HEAD )  https://github.com/rust-lang/cargo.git" >> ../cargo_version.md
 
 RUN cd rust && \
-    ./build.sh
+    ./build.sh && \
+    cd ..
+
+RUN cd cargo && \
+    cargo build --release && \
+    cd ..
 
 # Produce stage 2 docker with just the peices needed
 FROM launcher.gcr.io/google/debian8:latest
 LABEL maintainer "Solana Maintainers"
-COPY --from=builder version.md /usr/local
+COPY --from=builder rust_version.md /usr/local
+COPY --from=builder cargo_version.md /usr/local
 COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/stage1/ /usr/local
+COPY --from=builder cargo/target/release/cargo /usr/local/bin
 
 # # Install ld
 # RUN apt-get update && \
