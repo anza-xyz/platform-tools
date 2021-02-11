@@ -7,10 +7,11 @@ rm -rf out
 mkdir -p out
 cd out
 
-git clone --single-branch --branch solana-1.39 https://github.com/solana-labs/rust.git
+git clone --single-branch --branch solana-1.46 https://github.com/solana-labs/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
 
-git clone --single-branch --branch rust-1.39.0 https://github.com/rust-lang/cargo.git
+# note, branch v1.46.0, v1.47.0, and v1.48.0 fail to build
+git clone --single-branch --branch rust-1.49.0 https://github.com/rust-lang/cargo.git
 echo "$( cd cargo && git rev-parse HEAD )  https://github.com/rust-lang/cargo.git" >> version.md
 
 pushd rust

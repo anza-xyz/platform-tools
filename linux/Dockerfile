@@ -63,9 +63,9 @@ RUN cargo --version
 # ADD scripts /tmp/scripts
 
 # Checkout the source code
-RUN git clone --single-branch --branch solana-1.39 https://github.com/solana-labs/rust.git && \
+RUN git clone --single-branch --branch solana-1.46 https://github.com/solana-labs/rust.git && \
     echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> ../rust_version.md
-RUN git clone --single-branch --branch rust-1.39.0 https://github.com/rust-lang/cargo.git && \
+RUN git clone --single-branch --branch rust-1.49.0 https://github.com/rust-lang/cargo.git && \
     echo "$( cd cargo && git rev-parse HEAD )  https://github.com/rust-lang/cargo.git" >> ../cargo_version.md
 
 RUN cd rust && \
