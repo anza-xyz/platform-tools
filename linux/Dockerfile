@@ -79,12 +79,26 @@ RUN cd cargo && \
 # Produce stage 2 docker with just the peices needed
 FROM launcher.gcr.io/google/debian8:latest
 LABEL maintainer "Solana Maintainers"
-COPY --from=builder rust_version.md /usr/local
-COPY --from=builder cargo_version.md /usr/local
-COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/stage1/ /usr/local
-COPY --from=builder cargo/target/release/cargo /usr/local/bin
+run mkdir -p /usr/local/rust
+COPY --from=builder rust_version.md /usr/local/rust
+COPY --from=builder cargo_version.md /usr/local/rust
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/stage1/ /usr/local/rust
+COPY --from=builder cargo/target/release/cargo /usr/local/rust/bin
 
-# # Install ld
-# RUN apt-get update && \
-#     apt-get install -y --no-install-recommends build-essential && \
-#     rm -rf /var/lib/apt/lists/*
+run mkdir -p /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/clang /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/clang++ /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/clang-10 /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/clang-cl /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/clang-cpp /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/ld.lld /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/ld64.lld /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/llc /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/lld /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/lld-link /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/llvm-ar /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/llvm-objcopy /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/llvm-objdump /usr/local/llvm/bin
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/bin/llvm-readelf /usr/local/llvm/bin
+run mkdir -p /usr/local/llvm/lib
+COPY --from=builder /rust/build/x86_64-unknown-linux-gnu/llvm/build/lib/clang /usr/local/llvm/lib
