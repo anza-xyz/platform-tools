@@ -11,9 +11,9 @@ by Solana but not yet upstreamed into Rust or LLVM.
 $ ./build.sh
 ```
 
-* Builds Rust for Linux in Docker, tags and pushes `solanalabs/rust`
-* Copies Rust for Linux out of Docker the zips the products into `/deploy`
-* Builds Rust for MacOS natively and zips the products into `/deploy`
+* Builds for Linux in Docker, tags and pushes `solanalabs/rust`
+* Copies out of Docker the zips the products into `/deploy`
+* Builds for MacOS natively and zips the products into `/deploy`
 * Results in tarballs in `/deploy` that can be released
 
 ### Releases
@@ -21,6 +21,7 @@ $ ./build.sh
 This repo depends on the following:
 
 * https://github.com/solana-labs/rust
+* https://github.com/rust-lang/cargo.git
 
 * See `linux/Dockerfile` for an example of how to sync and build for Linux
 * See `macos/build.sh` for an example of how to sync and build for MacOS)
