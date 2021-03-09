@@ -23,7 +23,7 @@ mkdir -p deploy/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin # Needed by xargo
 mkdir -p deploy/llvm/bin
 docker cp "$id":/usr/local/llvm/bin/clang deploy/llvm/bin
 docker cp "$id":/usr/local/llvm/bin/clang++ deploy/llvm/bin
-docker cp "$id":/usr/local/llvm/bin/clang-10 deploy/llvm/bin
+docker cp "$id":/usr/local/llvm/bin/clang-11 deploy/llvm/bin
 docker cp "$id":/usr/local/llvm/bin/clang-cl deploy/llvm/bin
 docker cp "$id":/usr/local/llvm/bin/clang-cpp deploy/llvm/bin
 docker cp "$id":/usr/local/llvm/bin/ld.lld deploy/llvm/bin
@@ -42,4 +42,3 @@ docker cp "$id":/usr/local/llvm/lib deploy/llvm
 docker rm -v "$id"
 
 tar -C deploy -jcf solana-bpf-tools-linux.tar.bz2 .
-
