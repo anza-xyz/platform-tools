@@ -1,0 +1,34 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - target: x86_64-unknown-linux-gnu
+          os: ubuntu-latest
+          rust: nightly
+        - target: x86_64-apple-darwin
+          os: macos-latest
+          rust: nightly
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Rust (rustup)
+      run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
+      shell: bash
+    - run: rustup target add ${{ matrix.target }}
+    - name: Build on Linux
+      run: ./linux/build.sh
+      if: matrix.os == 'ubuntu-latest'
+      shell: bash
+    - name: Build on Mac
+      run: |
+        brew install ninja
+        ./osx/build.sh
+      if: matrix.os == 'macos-latest'
+      shell: bash
