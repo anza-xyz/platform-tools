@@ -1,5 +1,4 @@
-deploy
-osx/out
-linux/out
+deploy/
+out/
 
 .DS_Store

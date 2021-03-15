@@ -1,0 +1,46 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - target: x86_64-unknown-linux-gnu
+          os: ubuntu-latest
+          rust: stable
+          tar: linux
+        - target: x86_64-apple-darwin
+          os: macos-latest
+          rust: stable
+          tar: osx
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install ninja on Linux
+      run: |
+        wget "https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip" && \
+        echo "d2fea9ff33b3ef353161ed906f260d565ca55b8ca0568fa07b1d2cab90a84a07 ninja-linux.zip" \
+        | sha256sum -c
+        sudo unzip ninja-linux.zip -d /usr/local/bin && rm ninja-linux.zip
+      if: matrix.os == 'ubuntu-latest'
+      shell: bash
+    - name: Install ninja on macOS
+      run: brew install ninja
+      if: matrix.os == 'macos-latest'
+      shell: bash
+    - name: Install Rust (rustup)
+      run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
+      shell: bash
+    - run: rustup target add ${{ matrix.target }}
+    - name: Build
+      run: ./build.sh
+      shell: bash
+    - name: Upload tarball
+      uses: actions/upload-artifact@v2
+      with:
+        name: solana-bpf-tools-${{ matrix.tar }}.tar.bz2
+        path: out/solana-bpf-tools-${{ matrix.tar }}.tar.bz2
