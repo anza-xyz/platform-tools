@@ -11,10 +11,10 @@ jobs:
         include:
         - target: x86_64-unknown-linux-gnu
           os: ubuntu-latest
-          rust: nightly
+          rust: stable
         - target: x86_64-apple-darwin
           os: macos-latest
-          rust: nightly
+          rust: stable
 
     steps:
     - uses: actions/checkout@v1
@@ -26,9 +26,21 @@ jobs:
       run: ./linux/build.sh
       if: matrix.os == 'ubuntu-latest'
       shell: bash
-    - name: Build on Mac
+    - name: Build on macOS
       run: |
         brew install ninja
         ./osx/build.sh
       if: matrix.os == 'macos-latest'
       shell: bash
+    - name: Upload Linux tarball
+      uses: actions/upload-artifact@v2
+      if: matrix.os == 'ubuntu-latest'
+      with:
+        name: solana-bpf-tools-linux.tar.bz2
+        path: linux/out/solana-bpf-tools-linux.tar.bz2
+    - name: Upload macOS tarbal
+      uses: actions/upload-artifact@v2
+      if: matrix.os == 'macos-latest'
+      with:
+        name: solana-bpf-tools-osx.tar.bz2
+        path: osx/out/solana-bpf-tools-osx.tar.bz2
