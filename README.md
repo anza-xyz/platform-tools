@@ -35,3 +35,9 @@ appropriate repos listed above.
 This repository is used to build the toolchain binaries in GitHub
 Actions.  The created tarballs are uploaded as build artifacts in
 GitHub Actions.
+
+The release of the binaries is fully automated.  Do not release
+manually.  To release the binaries, push a release tag that starts
+with the '*v*' character, e.g. `v1.2`.  The GitHub workflow
+automatically triggers a new build, creates a release with the name of
+the tag, and uploads the toolchain tarballs as the release assets.
