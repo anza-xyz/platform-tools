@@ -1,9 +1,9 @@
 name: build
 
-on: [push, pull_request]
+on: [pull_request, push, workflow_dispatch]
 
 jobs:
-  test:
+  build:
     name: Build
     runs-on: ${{ matrix.os }}
     strategy:
@@ -17,7 +17,6 @@ jobs:
           os: macos-latest
           rust: stable
           tar: osx
-
     steps:
     - uses: actions/checkout@v1
     - name: Install ninja on Linux
@@ -32,15 +31,61 @@ jobs:
       run: brew install ninja
       if: matrix.os == 'macos-latest'
       shell: bash
-    - name: Install Rust (rustup)
-      run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
+    - name: Install Rust
+      run: |
+        rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
+        rustup target add ${{ matrix.target }}
       shell: bash
-    - run: rustup target add ${{ matrix.target }}
     - name: Build
       run: ./build.sh
       shell: bash
-    - name: Upload tarball
+    - name: Upload ${{ matrix.tar }} tarball
       uses: actions/upload-artifact@v2
       with:
         name: solana-bpf-tools-${{ matrix.tar }}.tar.bz2
         path: out/solana-bpf-tools-${{ matrix.tar }}.tar.bz2
+
+  release:
+    name: Upload Release Assets
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+    - name: Download Linux tarball
+      uses: actions/download-artifact@v2
+      with:
+        name: solana-bpf-tools-linux.tar.bz2
+    - name: Download macOS tarball
+      uses: actions/download-artifact@v2
+      with:
+        name: solana-bpf-tools-osx.tar.bz2
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+    - name: Release Linux tarball
+      id: upload-release-linux
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: solana-bpf-tools-linux.tar.bz2
+        asset_name: solana-bpf-tools-linux.tar.bz2
+        asset_content_type: application/zip
+    - name: Release macOS tarball
+      id: upload-release-macos
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: solana-bpf-tools-osx.tar.bz2
+        asset_name: solana-bpf-tools-osx.tar.bz2
+        asset_content_type: application/zip
