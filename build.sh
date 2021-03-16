@@ -18,7 +18,7 @@ pushd out
 git clone --single-branch --branch solana-1.50 https://github.com/solana-labs/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
 
-git clone --recurse-submodules --single-branch --branch v1.1 https://github.com/solana-labs/rust-bpf-sysroot.git
+git clone --recurse-submodules --single-branch --branch v1.2 https://github.com/solana-labs/rust-bpf-sysroot.git
 echo "$( cd rust-bpf-sysroot && git rev-parse HEAD )  https://github.com/solana-labs/rust-bpf-sysroot.git" >> version.md
 
 git clone --single-branch --branch rust-1.50.0 https://github.com/rust-lang/cargo.git
@@ -26,10 +26,11 @@ echo "$( cd cargo && git rev-parse HEAD )  https://github.com/rust-lang/cargo.gi
 
 pushd rust
 ./build.sh --llvm
+RUST_DIR=$PWD
 popd
 
 pushd rust-bpf-sysroot
-./test/build.sh ../rust/build/${HOST_TRIPLE}
+./test/build.sh ${RUST_DIR}/build/${HOST_TRIPLE}
 popd
 
 pushd cargo
