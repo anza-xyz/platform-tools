@@ -30,7 +30,7 @@ RUST_DIR=$PWD
 popd
 
 pushd rust-bpf-sysroot
-./test/build.sh ${RUST_DIR}/build/${HOST_TRIPLE}
+./test/build.sh "${RUST_DIR}/build/${HOST_TRIPLE}"
 popd
 
 pushd cargo
