@@ -10,7 +10,7 @@ jobs:
       matrix:
         include:
         - target: x86_64-unknown-linux-gnu
-          os: ubuntu-latest
+          os: ubuntu-18.04
           rust: stable
           tar: linux
         - target: x86_64-apple-darwin
@@ -25,7 +25,7 @@ jobs:
         echo "d2fea9ff33b3ef353161ed906f260d565ca55b8ca0568fa07b1d2cab90a84a07 ninja-linux.zip" \
         | sha256sum -c
         sudo unzip ninja-linux.zip -d /usr/local/bin && rm ninja-linux.zip
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-18.04'
       shell: bash
     - name: Install ninja on macOS
       run: brew install ninja
