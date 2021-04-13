@@ -11,30 +11,28 @@ jobs:
         include:
         - target: x86_64-unknown-linux-gnu
           os: ubuntu-18.04
+          ninja_file: ninja-linux.zip
+          ninja_sha: 763464859c7ef2ea3a0a10f4df40d2025d3bb9438fcb1228404640410c0ec22d
           rust: stable
           tar: linux
         - target: x86_64-apple-darwin
           os: macos-latest
+          ninja_file: ninja-mac.zip
+          ninja_sha: 6fa359f491fac7e5185273c6421a000eea6a2f0febf0ac03ac900bd4d80ed2a5
           rust: stable
           tar: osx
     steps:
     - uses: actions/checkout@v1
-    - name: Install ninja on Linux
-      run: |
-        wget "https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-linux.zip" && \
-        echo "763464859c7ef2ea3a0a10f4df40d2025d3bb9438fcb1228404640410c0ec22d ninja-linux.zip" \
-        | sha256sum -c
-        sudo unzip ninja-linux.zip -d /usr/local/bin && rm ninja-linux.zip
-      if: matrix.os == 'ubuntu-18.04'
-      shell: bash
-    - name: Install ninja on macOS
+    - name: Install coreutils
       run: |
         brew update && brew install coreutils
-        wget "https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-mac.zip" && \
-        echo "6fa359f491fac7e5185273c6421a000eea6a2f0febf0ac03ac900bd4d80ed2a5 ninja-mac.zip" \
-        | sha256sum -c
-        sudo unzip ninja-mac.zip -d /usr/local/bin && rm ninja-mac.zip
       if: matrix.os == 'macos-latest'
+      shell: bash
+    - name: Install Ninja
+      run: |
+        wget "https://github.com/ninja-build/ninja/releases/download/v1.10.2/${{ matrix.ninja_file }}" && \
+        echo "${{ matrix.ninja_sha }} ${{ matrix.ninja_file }}" | sha256sum -c && \
+        sudo unzip ${{ matrix.ninja_file }} -d /usr/local/bin && rm ${{ matrix.ninja_file }}
       shell: bash
     - name: Install Rust
       run: |
