@@ -15,7 +15,7 @@ rm -rf out
 mkdir -p out
 pushd out
 
-git clone --single-branch --branch bpf-tools-v1.7 https://github.com/solana-labs/rust.git
+git clone --single-branch --branch bpf-tools-v1.8 https://github.com/solana-labs/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
 
 git clone --single-branch --branch rust-1.50.0 https://github.com/rust-lang/cargo.git
