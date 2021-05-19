@@ -15,10 +15,10 @@ rm -rf out
 mkdir -p out
 pushd out
 
-git clone --single-branch --branch bpf-tools-v1.8 https://github.com/solana-labs/rust.git
+git clone --single-branch --branch bpf-tools-v1.9 https://github.com/solana-labs/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
 
-git clone --single-branch --branch rust-1.50.0 https://github.com/rust-lang/cargo.git
+git clone --single-branch --branch rust-1.52.0 https://github.com/rust-lang/cargo.git
 echo "$( cd cargo && git rev-parse HEAD )  https://github.com/rust-lang/cargo.git" >> version.md
 
 pushd rust
@@ -44,7 +44,7 @@ do
 done < <(cat <<EOF
 clang
 clang++
-clang-11
+clang-12
 clang-cl
 clang-cpp
 ld.lld
