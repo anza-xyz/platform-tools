@@ -48,7 +48,7 @@ cp -R rust/build/${HOST_TRIPLE}/stage1/bin deploy/rust/
 mkdir -p deploy/rust/lib/rustlib/
 cp -R rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/${HOST_TRIPLE} deploy/rust/lib/rustlib/
 cp -R rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/bpfel-unknown-unknown deploy/rust/lib/rustlib/
-cp -R cargo/target/release/cargo${EXE_SUFFIX} deploy/rust/bin/
+cp -R cargo/target/release/cargo"${EXE_SUFFIX}" deploy/rust/bin/
 
 # Copy llvm build products
 mkdir -p deploy/llvm/{bin,lib}
