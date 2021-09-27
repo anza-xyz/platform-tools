@@ -21,6 +21,12 @@ jobs:
           ninja_sha: 6fa359f491fac7e5185273c6421a000eea6a2f0febf0ac03ac900bd4d80ed2a5
           rust: stable
           tar: osx
+        - target: x86_64-pc-windows-msvc
+          os: windows-latest
+          ninja_file: ninja-win.zip
+          ninja_sha: bbde850d247d2737c5764c927d1071cbb1f1957dcabda4a130fa8547c12c695f
+          rust: stable
+          tar: windows
     steps:
     - uses: actions/checkout@v1
     - name: Install coreutils
@@ -62,6 +68,10 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: solana-bpf-tools-osx.tar.bz2
+    - name: Download Windows tarball
+      uses: actions/download-artifact@v2
+      with:
+        name: solana-bpf-tools-windows.tar.bz2
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -91,4 +101,14 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: solana-bpf-tools-osx.tar.bz2
         asset_name: solana-bpf-tools-osx.tar.bz2
+        asset_content_type: application/zip
+    - name: Release Windows tarball
+      id: upload-release-windows
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: solana-bpf-tools-windows.tar.bz2
+        asset_name: solana-bpf-tools-windows.tar.bz2
         asset_content_type: application/zip
