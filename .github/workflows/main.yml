@@ -13,18 +13,24 @@ jobs:
           os: ubuntu-18.04
           ninja_file: ninja-linux.zip
           ninja_sha: 763464859c7ef2ea3a0a10f4df40d2025d3bb9438fcb1228404640410c0ec22d
+          ninja_dir: /usr/local/bin
+          ninja_sudo: sudo
           rust: stable
           tar: linux
         - target: x86_64-apple-darwin
           os: macos-latest
           ninja_file: ninja-mac.zip
           ninja_sha: 6fa359f491fac7e5185273c6421a000eea6a2f0febf0ac03ac900bd4d80ed2a5
+          ninja_dir: /usr/local/bin
+          ninja_sudo: sudo
           rust: stable
           tar: osx
         - target: x86_64-pc-windows-msvc
           os: windows-latest
           ninja_file: ninja-win.zip
           ninja_sha: bbde850d247d2737c5764c927d1071cbb1f1957dcabda4a130fa8547c12c695f
+          ninja_dir: /usr/bin
+          ninja_sudo:
           rust: stable
           tar: windows
     steps:
@@ -38,7 +44,7 @@ jobs:
       run: |
         curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.10.2/${{ matrix.ninja_file }}" && \
         echo "${{ matrix.ninja_sha }} ${{ matrix.ninja_file }}" | sha256sum -c && \
-        sudo unzip ${{ matrix.ninja_file }} -d /usr/local/bin && rm ${{ matrix.ninja_file }}
+        ${{ matrix.ninja_sudo }} unzip ${{ matrix.ninja_file }} -d ${{ matrix.ninja_dir }} && rm ${{ matrix.ninja_file }}
       shell: bash
     - name: Install Rust
       run: |
