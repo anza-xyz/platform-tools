@@ -36,7 +36,7 @@ jobs:
       shell: bash
     - name: Install Ninja
       run: |
-        wget "https://github.com/ninja-build/ninja/releases/download/v1.10.2/${{ matrix.ninja_file }}" && \
+        curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.10.2/${{ matrix.ninja_file }}" && \
         echo "${{ matrix.ninja_sha }} ${{ matrix.ninja_file }}" | sha256sum -c && \
         sudo unzip ${{ matrix.ninja_file }} -d /usr/local/bin && rm ${{ matrix.ninja_file }}
       shell: bash
