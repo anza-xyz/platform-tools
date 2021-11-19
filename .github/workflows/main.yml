@@ -35,7 +35,7 @@ jobs:
           ninja_sudo:
           rust: stable
           tar: windows
-          out_dir: D:\out
+          out_dir: /d/out
     steps:
     - uses: actions/checkout@v1
     - name: Install coreutils
