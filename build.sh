@@ -18,10 +18,11 @@ case "${unameOut}" in
 esac
 
 cd "$(dirname "$0")"
+OUT_DIR=${1:-out}
 
-rm -rf out
-mkdir -p out
-pushd out
+rm -rf "${OUT_DIR}"
+mkdir -p "${OUT_DIR}"
+pushd "${OUT_DIR}"
 
 git clone --single-branch --branch bpf-tools-v1.20 https://github.com/solana-labs/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
@@ -43,10 +44,10 @@ if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
     mkdir -p newlib_build
     mkdir -p newlib_install
     pushd newlib_build
-    CC="${GITHUB_WORKSPACE}/out/rust/build/${HOST_TRIPLE}/llvm/bin/clang" \
-      AR="${GITHUB_WORKSPACE}/out/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ar" \
-      RANLIB="${GITHUB_WORKSPACE}/out/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ranlib" \
-      ../newlib/newlib/configure --target=sbf-solana-solana --host=sbf-solana --build="${HOST_TRIPLE}" --prefix="${GITHUB_WORKSPACE}/out/newlib_install"
+    CC="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/clang" \
+      AR="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ar" \
+      RANLIB="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ranlib" \
+      ../newlib/newlib/configure --target=sbf-solana-solana --host=sbf-solana --build="${HOST_TRIPLE}" --prefix="${OUT_DIR}/newlib_install"
     make install
     popd
 fi
@@ -130,8 +131,8 @@ popd
 if [[ "$(uname)" == "Darwin" ]] && [[ $# == 1 ]] && [[ "$1" == "--docker" ]] ; then
     docker system prune -a -f
     docker build -t solanalabs/bpf-tools .
-    id=$(docker create solanalabs/bpf-tools /build.sh)
+    id=$(docker create solanalabs/bpf-tools /build.sh "${OUT_DIR}")
     docker cp build.sh "${id}:/"
     docker start -a "${id}"
-    docker cp "${id}:out/solana-bpf-tools-linux.tar.bz2" out/
+    docker cp "${id}:${OUT_DIR}/solana-bpf-tools-linux.tar.bz2" "${OUT_DIR}"
 fi
