@@ -57,11 +57,16 @@ jobs:
     - name: Build
       run: ./build.sh ${{ matrix.out_dir }}
       shell: bash
-    - name: Upload ${{ matrix.tar }} tarball
+    - name: Upload ${{ matrix.tar }} BPF tarball
       uses: actions/upload-artifact@v2
       with:
         name: solana-bpf-tools-${{ matrix.tar }}.tar.bz2
         path: ${{ matrix.out_dir }}/solana-bpf-tools-${{ matrix.tar }}.tar.bz2
+    - name: Upload ${{ matrix.tar }} SBF tarball
+      uses: actions/upload-artifact@v2
+      with:
+        name: solana-sbf-tools-${{ matrix.tar }}.tar.bz2
+        path: ${{ matrix.out_dir }}/solana-sbf-tools-${{ matrix.tar }}.tar.bz2
 
   release:
     name: Upload Release Assets
@@ -69,14 +74,22 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
-    - name: Download Linux tarball
+    - name: Download Linux BPF tarball
       uses: actions/download-artifact@v2
       with:
         name: solana-bpf-tools-linux.tar.bz2
-    - name: Download macOS tarball
+    - name: Download macOS BPF tarball
       uses: actions/download-artifact@v2
       with:
         name: solana-bpf-tools-osx.tar.bz2
+    - name: Download Linux SBF tarball
+      uses: actions/download-artifact@v2
+      with:
+        name: solana-sbf-tools-linux.tar.bz2
+    - name: Download macOS SBF tarball
+      uses: actions/download-artifact@v2
+      with:
+        name: solana-sbf-tools-osx.tar.bz2
     # - name: Download Windows tarball
     #   uses: actions/download-artifact@v2
     #   with:
@@ -91,8 +104,8 @@ jobs:
         release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
-    - name: Release Linux tarball
-      id: upload-release-linux
+    - name: Release Linux BPF tarball
+      id: upload-release-linux-bpf
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -101,8 +114,8 @@ jobs:
         asset_path: solana-bpf-tools-linux.tar.bz2
         asset_name: solana-bpf-tools-linux.tar.bz2
         asset_content_type: application/zip
-    - name: Release macOS tarball
-      id: upload-release-macos
+    - name: Release macOS BPF tarball
+      id: upload-release-macos-bpf
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -110,6 +123,26 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: solana-bpf-tools-osx.tar.bz2
         asset_name: solana-bpf-tools-osx.tar.bz2
+        asset_content_type: application/zip
+    - name: Release Linux SBF tarball
+      id: upload-release-linux-sbf
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: solana-sbf-tools-linux.tar.bz2
+        asset_name: solana-sbf-tools-linux.tar.bz2
+        asset_content_type: application/zip
+    - name: Release macOS SBF tarball
+      id: upload-release-macos-sbf
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: solana-sbf-tools-osx.tar.bz2
+        asset_name: solana-sbf-tools-osx.tar.bz2
         asset_content_type: application/zip
     # - name: Release Windows tarball
     #   id: upload-release-windows

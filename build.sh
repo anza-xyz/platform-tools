@@ -24,7 +24,7 @@ rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
 pushd "${OUT_DIR}"
 
-git clone --single-branch --branch bpf-tools-v1.21 https://github.com/solana-labs/rust.git
+git clone --single-branch --branch bpf-tools-v1.22 https://github.com/solana-labs/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
 
 git clone --single-branch --branch rust-1.56.0 https://github.com/rust-lang/cargo.git
@@ -39,7 +39,7 @@ OPENSSL_STATIC=1 cargo build --release
 popd
 
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
-    git clone --single-branch --branch bpf-tools-v1.21 https://github.com/solana-labs/newlib.git
+    git clone --single-branch --branch bpf-tools-v1.22 https://github.com/solana-labs/newlib.git
     echo "$( cd newlib && git rev-parse HEAD )  https://github.com/solana-labs/newlib.git" >> version.md
     mkdir -p newlib_build
     mkdir -p newlib_install
@@ -125,6 +125,11 @@ EOF
          )
 
 tar -C deploy -jcf ${ARTIFACT} .
+
+rm -rf deploy/rust/lib/rustlib/bpfel-unknown-unknown
+cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbf-solana-solana" deploy/rust/lib/rustlib/
+tar -C deploy -jcf ${ARTIFACT/bpf/sbf} .
+
 popd
 
 # Build linux binaries on macOS in docker
