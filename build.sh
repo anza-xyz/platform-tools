@@ -132,6 +132,8 @@ tar -C deploy -jcf ${ARTIFACT/bpf/sbf} .
 
 popd
 
+mv "${OUT_DIR}/${ARTIFACT}" "${OUT_DIR}/${ARTIFACT/bpf/sbf}" .
+
 # Build linux binaries on macOS in docker
 if [[ "$(uname)" == "Darwin" ]] && [[ $# == 1 ]] && [[ "$1" == "--docker" ]] ; then
     docker system prune -a -f
