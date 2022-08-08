@@ -35,7 +35,11 @@ pushd rust
 popd
 
 pushd cargo
-OPENSSL_STATIC=1 cargo build --release
+if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" ]] ; then
+    OPENSSL_STATIC=1 OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu OPENSSL_INCLUDE_DIR=/usr/include/openssl cargo build --release
+else
+    OPENSSL_STATIC=1 cargo build --release
+fi
 popd
 
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
