@@ -24,10 +24,10 @@ rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
 pushd "${OUT_DIR}"
 
-git clone --single-branch --branch sbf-tools-v1.31 https://github.com/solana-labs/rust.git
+git clone --single-branch --branch sbf-tools-v1.32 https://github.com/solana-labs/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
 
-git clone --single-branch --branch sbf-tools-v1.31 https://github.com/solana-labs/cargo.git
+git clone --single-branch --branch sbf-tools-v1.32 https://github.com/solana-labs/cargo.git
 echo "$( cd cargo && git rev-parse HEAD )  https://github.com/solana-labs/cargo.git" >> version.md
 
 pushd rust
@@ -43,7 +43,7 @@ fi
 popd
 
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
-    git clone --single-branch --branch sbf-tools-v1.31 https://github.com/solana-labs/newlib.git
+    git clone --single-branch --branch sbf-tools-v1.32 https://github.com/solana-labs/newlib.git
     echo "$( cd newlib && git rev-parse HEAD )  https://github.com/solana-labs/newlib.git" >> version.md
     mkdir -p newlib_build
     mkdir -p newlib_install
@@ -82,7 +82,7 @@ clang
 clang++
 clang-cl
 clang-cpp
-clang-14
+clang-15
 ld.lld
 ld64.lld
 llc
