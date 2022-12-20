@@ -20,7 +20,7 @@ jobs:
       matrix:
         include:
         - target: x86_64-unknown-linux-gnu
-          os: ubuntu-latest
+          os: ubuntu-20.04
           ninja_file: ninja-linux.zip
           ninja_sha: b901ba96e486dce377f9a070ed4ef3f79deb45f4ffe2938f8e7ddc69cfb3df77
           ninja_dir: /usr/local/bin
