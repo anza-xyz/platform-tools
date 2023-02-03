@@ -24,14 +24,31 @@ rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
 pushd "${OUT_DIR}"
 
-git clone --single-branch --branch sbf-tools-v1.32 https://github.com/solana-labs/rust.git
+git clone --single-branch --branch sbf-tools-v1.33 https://github.com/solana-labs/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
 
-git clone --single-branch --branch sbf-tools-v1.32 https://github.com/solana-labs/cargo.git
+git clone --single-branch --branch sbf-tools-v1.33 https://github.com/solana-labs/cargo.git
 echo "$( cd cargo && git rev-parse HEAD )  https://github.com/solana-labs/cargo.git" >> version.md
 
 pushd rust
+if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
+    # Do not build lldb on Windows
+    sed -i -e 's#enable-projects = \"clang;lld;lldb\"#enable-projects = \"clang;lld\"#g' config.toml
+fi
 ./build.sh
+# remove when solana-lldb is fixed in llvm-project
+if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
+    # shellcheck disable=SC2016
+    sed -i -e 's#lldb=./lldb#here=$(dirname "$0")\nlldb=${here}/lldb#g' src/llvm-project/lldb/scripts/solana/solana-lldb
+    # shellcheck disable=SC2016
+    sed -i -e 's#script_import_rust="command script import \\"lldb_lookup.py\\""#script_import_rust="command script import \\"${here}/lldb_lookup.py\\""#g' src/llvm-project/lldb/scripts/solana/solana-lldb
+    # shellcheck disable=SC2016
+    sed -i -e 's#script_import_solana="command script import \\"solana_lookup.py\\""#script_import_solana="command script import \\"${here}/solana_lookup.py\\""#g' src/llvm-project/lldb/scripts/solana/solana-lldb
+    # shellcheck disable=SC2016
+    sed -i -e 's#commands_file_rust="lldb_commands"#commands_file_rust="${here}/lldb_commands"#g' src/llvm-project/lldb/scripts/solana/solana-lldb
+    # shellcheck disable=SC2016
+    sed -i -e 's#commands_file_solana="solana_commands"#commands_file_solana="${here}/solana_commands"#g' src/llvm-project/lldb/scripts/solana/solana-lldb
+fi
 popd
 
 pushd cargo
@@ -43,7 +60,7 @@ fi
 popd
 
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
-    git clone --single-branch --branch sbf-tools-v1.32 https://github.com/solana-labs/newlib.git
+    git clone --single-branch --branch sbf-tools-v1.33 https://github.com/solana-labs/newlib.git
     echo "$( cd newlib && git rev-parse HEAD )  https://github.com/solana-labs/newlib.git" >> version.md
     mkdir -p newlib_build
     mkdir -p newlib_install
@@ -88,6 +105,8 @@ ld64.lld
 llc
 lld
 lld-link
+lldb
+lldb-vscode
 llvm-ar
 llvm-objcopy
 llvm-objdump
@@ -99,6 +118,9 @@ cp -R "rust/build/${HOST_TRIPLE}/llvm/build/lib/clang" deploy/llvm/lib/
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
     cp -R newlib_install/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/
     cp -R newlib_install/sbf-solana/include deploy/llvm/
+    cp -R rust/src/llvm-project/lldb/scripts/solana/* deploy/llvm/bin/
+    cp -R rust/build/${HOST_TRIPLE}/llvm/lib/liblldb.* deploy/llvm/lib/
+    cp -R rust/build/${HOST_TRIPLE}/llvm/lib/python* deploy/llvm/lib/
 fi
 
 # Check the Rust binaries
@@ -114,7 +136,9 @@ EOF
 # Check the LLVM binaries
 while IFS= read -r f
 do
-    "./deploy/llvm/bin/${f}${EXE_SUFFIX}" --version
+    if [[ -f "./deploy/llvm/bin/${f}${EXE_SUFFIX}" ]] ; then
+        "./deploy/llvm/bin/${f}${EXE_SUFFIX}" --version
+    fi
 done < <(cat <<EOF
 clang
 clang++
@@ -128,6 +152,7 @@ llvm-objcopy
 llvm-objdump
 llvm-readelf
 llvm-readobj
+solana-lldb
 EOF
          )
 
