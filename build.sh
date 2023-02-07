@@ -36,19 +36,6 @@ if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
     sed -i -e 's#enable-projects = \"clang;lld;lldb\"#enable-projects = \"clang;lld\"#g' config.toml
 fi
 ./build.sh
-# remove when solana-lldb is fixed in llvm-project
-if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
-    # shellcheck disable=SC2016
-    sed -i -e 's#lldb=./lldb#here=$(dirname "$0")\nlldb=${here}/lldb#g' src/llvm-project/lldb/scripts/solana/solana-lldb
-    # shellcheck disable=SC2016
-    sed -i -e 's#script_import_rust="command script import \\"lldb_lookup.py\\""#script_import_rust="command script import \\"${here}/lldb_lookup.py\\""#g' src/llvm-project/lldb/scripts/solana/solana-lldb
-    # shellcheck disable=SC2016
-    sed -i -e 's#script_import_solana="command script import \\"solana_lookup.py\\""#script_import_solana="command script import \\"${here}/solana_lookup.py\\""#g' src/llvm-project/lldb/scripts/solana/solana-lldb
-    # shellcheck disable=SC2016
-    sed -i -e 's#commands_file_rust="lldb_commands"#commands_file_rust="${here}/lldb_commands"#g' src/llvm-project/lldb/scripts/solana/solana-lldb
-    # shellcheck disable=SC2016
-    sed -i -e 's#commands_file_solana="solana_commands"#commands_file_solana="${here}/solana_commands"#g' src/llvm-project/lldb/scripts/solana/solana-lldb
-fi
 popd
 
 pushd cargo
