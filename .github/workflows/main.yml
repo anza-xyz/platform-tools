@@ -69,12 +69,12 @@ jobs:
       run: ./build.sh ${{ matrix.out_dir }}
       shell: bash
     - name: Upload ${{ matrix.tar }} BPF tarball
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: solana-bpf-tools-${{ matrix.tar }}.tar.bz2
         path: solana-bpf-tools-${{ matrix.tar }}.tar.bz2
     - name: Upload ${{ matrix.tar }} SBF tarball
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: solana-sbf-tools-${{ matrix.tar }}.tar.bz2
         path: solana-sbf-tools-${{ matrix.tar }}.tar.bz2
@@ -86,27 +86,27 @@ jobs:
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
     - name: Download Linux BPF tarball
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: solana-bpf-tools-linux.tar.bz2
     - name: Download macOS BPF tarball
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: solana-bpf-tools-osx.tar.bz2
     - name: Download Linux SBF tarball
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: solana-sbf-tools-linux.tar.bz2
     - name: Download macOS SBF tarball
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: solana-sbf-tools-osx.tar.bz2
     - name: Download Windows BPF tarball
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: solana-bpf-tools-windows.tar.bz2
     - name: Download Windows SBF tarball
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: solana-sbf-tools-windows.tar.bz2
     - name: Create Release
