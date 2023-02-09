@@ -71,13 +71,13 @@ jobs:
     - name: Upload ${{ matrix.tar }} BPF tarball
       uses: actions/upload-artifact@v3
       with:
-        name: solana-bpf-tools-${{ matrix.tar }}.tar.bz2
-        path: solana-bpf-tools-${{ matrix.tar }}.tar.bz2
+        name: solana-bpf-tools-${{ matrix.tar }}-x86_64.tar.bz2
+        path: solana-bpf-tools-${{ matrix.tar }}-x86_64.tar.bz2
     - name: Upload ${{ matrix.tar }} SBF tarball
       uses: actions/upload-artifact@v3
       with:
-        name: solana-sbf-tools-${{ matrix.tar }}.tar.bz2
-        path: solana-sbf-tools-${{ matrix.tar }}.tar.bz2
+        name: solana-sbf-tools-${{ matrix.tar }}-x86_64.tar.bz2
+        path: solana-sbf-tools-${{ matrix.tar }}-x86_64.tar.bz2
 
   release:
     name: Upload Release Assets
@@ -88,19 +88,19 @@ jobs:
     - name: Download Linux BPF tarball
       uses: actions/download-artifact@v3
       with:
-        name: solana-bpf-tools-linux.tar.bz2
+        name: solana-bpf-tools-linux-x86_64.tar.bz2
     - name: Download macOS BPF tarball
       uses: actions/download-artifact@v3
       with:
-        name: solana-bpf-tools-osx.tar.bz2
+        name: solana-bpf-tools-osx-x86_64.tar.bz2
     - name: Download Linux SBF tarball
       uses: actions/download-artifact@v3
       with:
-        name: solana-sbf-tools-linux.tar.bz2
+        name: solana-sbf-tools-linux-x86_64.tar.bz2
     - name: Download macOS SBF tarball
       uses: actions/download-artifact@v3
       with:
-        name: solana-sbf-tools-osx.tar.bz2
+        name: solana-sbf-tools-osx-x86_64.tar.bz2
     - name: Download Windows BPF tarball
       uses: actions/download-artifact@v3
       with:
@@ -108,7 +108,7 @@ jobs:
     - name: Download Windows SBF tarball
       uses: actions/download-artifact@v3
       with:
-        name: solana-sbf-tools-windows.tar.bz2
+        name: solana-sbf-tools-windows-x86_64.tar.bz2
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -126,8 +126,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: solana-bpf-tools-linux.tar.bz2
-        asset_name: solana-bpf-tools-linux.tar.bz2
+        asset_path: solana-bpf-tools-linux-x86_64.tar.bz2
+        asset_name: solana-bpf-tools-linux-x86_64.tar.bz2
         asset_content_type: application/zip
     - name: Release macOS BPF tarball
       id: upload-release-macos-bpf
@@ -136,8 +136,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: solana-bpf-tools-osx.tar.bz2
-        asset_name: solana-bpf-tools-osx.tar.bz2
+        asset_path: solana-bpf-tools-osx-x86_64.tar.bz2
+        asset_name: solana-bpf-tools-osx-x86_64.tar.bz2
         asset_content_type: application/zip
     - name: Release Linux SBF tarball
       id: upload-release-linux-sbf
@@ -146,8 +146,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: solana-sbf-tools-linux.tar.bz2
-        asset_name: solana-sbf-tools-linux.tar.bz2
+        asset_path: solana-sbf-tools-linux-x86_64.tar.bz2
+        asset_name: solana-sbf-tools-linux-x86_64.tar.bz2
         asset_content_type: application/zip
     - name: Release macOS SBF tarball
       id: upload-release-macos-sbf
@@ -156,8 +156,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: solana-sbf-tools-osx.tar.bz2
-        asset_name: solana-sbf-tools-osx.tar.bz2
+        asset_path: solana-sbf-tools-osx-x86_64.tar.bz2
+        asset_name: solana-sbf-tools-osx-x86_64.tar.bz2
         asset_content_type: application/zip
     - name: Release Windows BPF tarball
       id: upload-release-windows-bpf
@@ -166,8 +166,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: solana-bpf-tools-windows.tar.bz2
-        asset_name: solana-bpf-tools-windows.tar.bz2
+        asset_path: solana-bpf-tools-windows-x86_64.tar.bz2
+        asset_name: solana-bpf-tools-windows-x86_64.tar.bz2
         asset_content_type: application/zip
     - name: Release Windows SBF tarball
       id: upload-release-windows-sbf
@@ -176,6 +176,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: solana-sbf-tools-windows.tar.bz2
-        asset_name: solana-sbf-tools-windows.tar.bz2
+        asset_path: solana-sbf-tools-windows-x86_64.tar.bz2
+        asset_name: solana-sbf-tools-windows-x86_64.tar.bz2
         asset_content_type: application/zip

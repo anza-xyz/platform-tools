@@ -5,16 +5,26 @@ unameOut="$(uname -s)"
 case "${unameOut}" in
     Darwin*)
         EXE_SUFFIX=
-        HOST_TRIPLE=x86_64-apple-darwin
-        ARTIFACT=solana-bpf-tools-osx.tar.bz2;;
+        if [[ "$(uname -m)" == "arm64" ]] ; then
+            HOST_TRIPLE=aarch64-apple-darwin
+            ARTIFACT=solana-bpf-tools-osx-aarch64.tar.bz2
+        else
+            HOST_TRIPLE=x86_64-apple-darwin
+            ARTIFACT=solana-bpf-tools-osx-x86_64.tar.bz2
+        fi;;
     MINGW*)
         EXE_SUFFIX=.exe
         HOST_TRIPLE=x86_64-pc-windows-msvc
-        ARTIFACT=solana-bpf-tools-windows.tar.bz2;;
+        ARTIFACT=solana-bpf-tools-windows-x86_64.tar.bz2;;
     Linux* | *)
         EXE_SUFFIX=
-        HOST_TRIPLE=x86_64-unknown-linux-gnu
-        ARTIFACT=solana-bpf-tools-linux.tar.bz2
+        if [[ "$(uname -m)" == "arm64" ]] ; then
+            HOST_TRIPLE=aarch64-unknown-linux-gnu
+            ARTIFACT=solana-bpf-tools-linux-aarch64.tar.bz2
+        else
+            HOST_TRIPLE=x86_64-unknown-linux-gnu
+            ARTIFACT=solana-bpf-tools-linux-x86_64.tar.bz2
+        fi
 esac
 
 cd "$(dirname "$0")"
@@ -160,5 +170,5 @@ if [[ "$(uname)" == "Darwin" ]] && [[ $# == 1 ]] && [[ "$1" == "--docker" ]] ; t
     id=$(docker create solanalabs/bpf-tools /build.sh "${OUT_DIR}")
     docker cp build.sh "${id}:/"
     docker start -a "${id}"
-    docker cp "${id}:${OUT_DIR}/solana-bpf-tools-linux.tar.bz2" "${OUT_DIR}"
+    docker cp "${id}:${OUT_DIR}/solana-bpf-tools-linux-x86_64.tar.bz2" "${OUT_DIR}"
 fi
