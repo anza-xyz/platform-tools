@@ -104,7 +104,7 @@ jobs:
     - name: Download Windows BPF tarball
       uses: actions/download-artifact@v3
       with:
-        name: solana-bpf-tools-windows.tar.bz2
+        name: solana-bpf-tools-windows-x86_64.tar.bz2
     - name: Download Windows SBF tarball
       uses: actions/download-artifact@v3
       with:
