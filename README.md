@@ -1,9 +1,10 @@
-# Customized Rust/Clang binaries for Solana that support Berkley Packer Filter (BPF)
+# Customized Rust/Clang toolchain for Solana Platform
 
-[![Build Status](https://travis-ci.org/solana-labs/rust-bpf-builder.svg?branch=master)](https://travis-ci.org/solana-labs/rust-bpf-builder)
+[![Build Status](https://github.com/solana-labs/platform-tools/actions/workflows/main.yml/badge.svg)](https://github.com/solana-labs/platform-tools/actions/workflows/main.yml/badge.svg)
 
-Builds Rust binaries that incorporate customizations and fixes required
-by Solana but not yet upstreamed into Rust or LLVM.
+Builds Clang and Rust compiler binaries that incorporate
+customizations and fixes required by Solana but not yet upstreamed
+into Rust or LLVM.
 
 * Builds Rust for Linux (Debian) natively, or in Docker if runs on MacOS
 * Builds Rust for MacOS natively therefore skipped if not building on a Mac
@@ -25,7 +26,10 @@ ignored.
 This repo depends on the following:
 
 * https://github.com/solana-labs/rust
-* https://github.com/solana-labs/rust-bpf-sysroot
+* https://github.com/solana-labs/llvm-project
+* https://github.com/solana-labs/compiler-builtins
+* https://github.com/solana-labs/newlib
+* https://github.com/solana-labs/cargo
 
 Any changes that need to go into a Rust release must be made in the
 appropriate repos listed above.
