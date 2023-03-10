@@ -7,23 +7,23 @@ case "${unameOut}" in
         EXE_SUFFIX=
         if [[ "$(uname -m)" == "arm64" ]] ; then
             HOST_TRIPLE=aarch64-apple-darwin
-            ARTIFACT=solana-bpf-tools-osx-aarch64.tar.bz2
+            ARTIFACT=platform-tools-osx-aarch64.tar.bz2
         else
             HOST_TRIPLE=x86_64-apple-darwin
-            ARTIFACT=solana-bpf-tools-osx-x86_64.tar.bz2
+            ARTIFACT=platform-tools-osx-x86_64.tar.bz2
         fi;;
     MINGW*)
         EXE_SUFFIX=.exe
         HOST_TRIPLE=x86_64-pc-windows-msvc
-        ARTIFACT=solana-bpf-tools-windows-x86_64.tar.bz2;;
+        ARTIFACT=platform-tools-windows-x86_64.tar.bz2;;
     Linux* | *)
         EXE_SUFFIX=
         if [[ "$(uname -m)" == "arm64" ]] ; then
             HOST_TRIPLE=aarch64-unknown-linux-gnu
-            ARTIFACT=solana-bpf-tools-linux-aarch64.tar.bz2
+            ARTIFACT=platform-tools-linux-aarch64.tar.bz2
         else
             HOST_TRIPLE=x86_64-unknown-linux-gnu
-            ARTIFACT=solana-bpf-tools-linux-x86_64.tar.bz2
+            ARTIFACT=platform-tools-linux-x86_64.tar.bz2
         fi
 esac
 
@@ -34,10 +34,10 @@ rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
 pushd "${OUT_DIR}"
 
-git clone --single-branch --branch sbf-tools-v1.35 https://github.com/solana-labs/rust.git
+git clone --single-branch --branch solana-tools-v1.36 https://github.com/solana-labs/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
 
-git clone --single-branch --branch sbf-tools-v1.35 https://github.com/solana-labs/cargo.git
+git clone --single-branch --branch solana-tools-v1.36 https://github.com/solana-labs/cargo.git
 echo "$( cd cargo && git rev-parse HEAD )  https://github.com/solana-labs/cargo.git" >> version.md
 
 pushd rust
@@ -57,7 +57,7 @@ fi
 popd
 
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
-    git clone --single-branch --branch sbf-tools-v1.35 https://github.com/solana-labs/newlib.git
+    git clone --single-branch --branch solana-tools-v1.36 https://github.com/solana-labs/newlib.git
     echo "$( cd newlib && git rev-parse HEAD )  https://github.com/solana-labs/newlib.git" >> version.md
     mkdir -p newlib_build
     mkdir -p newlib_install
@@ -76,8 +76,7 @@ cp version.md deploy/
 cp -R "rust/build/${HOST_TRIPLE}/stage1/bin" deploy/rust/
 cp -R "cargo/target/release/cargo${EXE_SUFFIX}" deploy/rust/bin/
 mkdir -p deploy/rust/lib/rustlib/
-cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/${HOST_TRIPLE}" deploy/rust/lib/rustlib/
-cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/bpfel-unknown-unknown" deploy/rust/lib/rustlib/
+cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbf-solana-solana" deploy/rust/lib/rustlib/
 find . -maxdepth 6 -type f -path "./rust/build/${HOST_TRIPLE}/stage1/lib/*" -exec cp {} deploy/rust/lib \;
 mkdir -p deploy/rust/lib/rustlib/src/rust
 cp "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/src/rust/Cargo.lock" deploy/rust/lib/rustlib/src/rust
@@ -155,20 +154,16 @@ EOF
 
 tar -C deploy -jcf ${ARTIFACT} .
 
-rm -rf deploy/rust/lib/rustlib/bpfel-unknown-unknown
-cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbf-solana-solana" deploy/rust/lib/rustlib/
-tar -C deploy -jcf ${ARTIFACT/bpf/sbf} .
-
 popd
 
-mv "${OUT_DIR}/${ARTIFACT}" "${OUT_DIR}/${ARTIFACT/bpf/sbf}" .
+mv "${OUT_DIR}/${ARTIFACT}" .
 
 # Build linux binaries on macOS in docker
 if [[ "$(uname)" == "Darwin" ]] && [[ $# == 1 ]] && [[ "$1" == "--docker" ]] ; then
     docker system prune -a -f
-    docker build -t solanalabs/bpf-tools .
-    id=$(docker create solanalabs/bpf-tools /build.sh "${OUT_DIR}")
+    docker build -t solanalabs/platform-tools .
+    id=$(docker create solanalabs/platform-tools /build.sh "${OUT_DIR}")
     docker cp build.sh "${id}:/"
     docker start -a "${id}"
-    docker cp "${id}:${OUT_DIR}/solana-bpf-tools-linux-x86_64.tar.bz2" "${OUT_DIR}"
+    docker cp "${id}:${OUT_DIR}/solana-sbf-tools-linux-x86_64.tar.bz2" "${OUT_DIR}"
 fi
