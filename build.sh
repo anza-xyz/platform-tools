@@ -155,9 +155,19 @@ EOF
 
 tar -C deploy -jcf ${ARTIFACT} .
 
+# Package LLVM binaries for Move project
+MOVE_DEV_TAR=${ARTIFACT/platform-tools/move-dev}
+mkdir move-dev
+if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
+    rm -f rust/build/${HOST_TRIPLE}/llvm/bin/{llvm-ranlib.exe,llvm-lib.exe,llvm-dlltool.exe}
+fi
+cp -R "rust/build/${HOST_TRIPLE}/llvm/"{bin,include,lib} move-dev/
+tar -jcf "${MOVE_DEV_TAR}" move-dev
+
 popd
 
 mv "${OUT_DIR}/${ARTIFACT}" .
+mv "${OUT_DIR}/${MOVE_DEV_TAR}" .
 
 # Build linux binaries on macOS in docker
 if [[ "$(uname)" == "Darwin" ]] && [[ $# == 1 ]] && [[ "$1" == "--docker" ]] ; then
