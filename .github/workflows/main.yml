@@ -51,7 +51,6 @@ jobs:
     - name: Install coreutils
       run: |
         brew update && brew install coreutils
-        brew rm swig && brew install swig@3 && brew link swig@3
       if: matrix.os == 'macos-latest'
       shell: bash
     - name: Install Ninja
