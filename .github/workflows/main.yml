@@ -88,14 +88,26 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: platform-tools-linux-x86_64.tar.bz2
+    - name: Download Linux move-dev
+      uses: actions/download-artifact@v3
+      with:
+        name: move-dev-linux-x86_64.tar.bz2
     - name: Download macOS tarball
       uses: actions/download-artifact@v3
       with:
         name: platform-tools-osx-x86_64.tar.bz2
+    - name: Download macOS move-dev
+      uses: actions/download-artifact@v3
+      with:
+        name: move-dev-osx-x86_64.tar.bz2
     - name: Download Windows tarball
       uses: actions/download-artifact@v3
       with:
         name: platform-tools-windows-x86_64.tar.bz2
+    - name: Download Windows move-dev
+      uses: actions/download-artifact@v3
+      with:
+        name: move-dev-windows-x86_64.tar.bz2
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -116,6 +128,16 @@ jobs:
         asset_path: platform-tools-linux-x86_64.tar.bz2
         asset_name: platform-tools-linux-x86_64.tar.bz2
         asset_content_type: application/zip
+    - name: Release Linux move-dev
+      id: upload-release-linux-move
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: move-dev-linux-x86_64.tar.bz2
+        asset_name: move-dev-linux-x86_64.tar.bz2
+        asset_content_type: application/zip
     - name: Release macOS tarball
       id: upload-release-macos
       uses: actions/upload-release-asset@v1
@@ -126,6 +148,16 @@ jobs:
         asset_path: platform-tools-osx-x86_64.tar.bz2
         asset_name: platform-tools-osx-x86_64.tar.bz2
         asset_content_type: application/zip
+    - name: Release macOS move-dev
+      id: upload-release-macos-move
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: move-dev-osx-x86_64.tar.bz2
+        asset_name: move-dev-osx-x86_64.tar.bz2
+        asset_content_type: application/zip
     - name: Release Windows tarball
       id: upload-release-windows
       uses: actions/upload-release-asset@v1
@@ -135,4 +167,14 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: platform-tools-windows-x86_64.tar.bz2
         asset_name: platform-tools-windows-x86_64.tar.bz2
+        asset_content_type: application/zip
+    - name: Release Windows move-dev
+      id: upload-release-windows-move
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: move-dev-windows-x86_64.tar.bz2
+        asset_name: move-dev-windows-x86_64.tar.bz2
         asset_content_type: application/zip
