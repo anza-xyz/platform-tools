@@ -12,6 +12,15 @@ case "${unameOut}" in
             HOST_TRIPLE=x86_64-apple-darwin
             ARTIFACT=platform-tools-osx-x86_64.tar.bz2
         fi;;
+    FreeBSD*)
+        EXE_SUFFIX=
+        if [[ "$(uname -m)" == "arm64" ]] ; then
+            HOST_TRIPLE=aarch64-unknown-freebsd
+            ARTIFACT=platform-tools-freebsd-aarch64.tar.bz2
+        else
+            HOST_TRIPLE=x86_64-unknown-freebsd
+            ARTIFACT=platform-tools-freebsd-x86_64.tar.bz2
+        fi;;
     MINGW*)
         EXE_SUFFIX=.exe
         HOST_TRIPLE=x86_64-pc-windows-msvc
@@ -27,47 +36,93 @@ case "${unameOut}" in
         fi
 esac
 
+# note: directory must exist for realpath on *BSD
 cd "$(dirname "$0")"
-OUT_DIR=$(realpath "${1:-out}")
-
-rm -rf "${OUT_DIR}"
-mkdir -p "${OUT_DIR}"
-pushd "${OUT_DIR}"
-
-git clone --single-branch --branch solana-tools-v1.38 https://github.com/solana-labs/rust.git
-echo "$( cd rust && git rev-parse HEAD )  https://github.com/solana-labs/rust.git" >> version.md
-
-git clone --single-branch --branch solana-tools-v1.38 https://github.com/solana-labs/cargo.git
-echo "$( cd cargo && git rev-parse HEAD )  https://github.com/solana-labs/cargo.git" >> version.md
-
-pushd rust
-if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
-    # Do not build lldb on Windows
-    sed -i -e 's#enable-projects = \"clang;lld;lldb\"#enable-projects = \"clang;lld\"#g' config.toml
+OUT_DIR="${1:-out}"
+if [[ -e "${OUT_DIR}" ]] ; then
+    OUT_DIR="$(realpath "${OUT_DIR}")"
+    rm -rf -- "${OUT_DIR}"
 fi
-./build.sh
-popd
 
-pushd cargo
-if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" ]] ; then
-    OPENSSL_STATIC=1 OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu OPENSSL_INCLUDE_DIR=/usr/include/openssl cargo build --release
-else
-    OPENSSL_STATIC=1 cargo build --release
-fi
-popd
+mkdir -p -- "${OUT_DIR}"
+OUT_DIR="$(realpath "${OUT_DIR}")"
+pushd -- "${OUT_DIR}"
+
+GIT_BRANCH='solana-tools-v1.38'
+
+function git_clone() {
+    local REPO="${1}"
+    local URL="https://github.com/solana-labs/${REPO}.git"
+    git clone --single-branch --branch "${GIT_BRANCH}" "${URL}"
+    local COMMIT="$(git -C "${REPO}" rev-parse HEAD)"
+    echo "${COMMIT}  ${URL}" >> version.md
+}
+
+git_clone rust
+git_clone cargo
+
+(   # sub shell
+    cd rust
+    if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
+        # Do not build lldb on Windows
+	sed -i -e 's#enable-projects = "clang;lld;lldb"#enable-projects = "clang;lld"#g' config.toml
+    elif [[ "${HOST_TRIPLE}" == *-"unknown-freebsd" ]] ; then
+	# Fixup build.sh in solana-labs/rust until FreeBSD added there
+	fgrep -q 'HOST_TRIPLE=x86_64-unknown-freebsd' build.sh ||
+	ed build.sh <<-'EOF'
+	/HOST_TRIPLE=x86_64-unknown-linux-gnu/i
+	    FreeBSD-amd64*) HOST_TRIPLE=x86_64-unknown-freebsd;;
+	    FreeBSD-arm64*) HOST_TRIPLE=aarch64-unknown-freebsd;;
+	.
+	w
+	EOF
+        # Use swig40 instead of default swig 4.1.2 on FreeBSD due to
+	# broken %nothreadallow / %clearnothreadallow directives
+	ed config.toml <<-'EOF'
+	/^\[llvm\]/a
+
+	# Custom CMake defines to set when building LLVM.
+	build-config = { SWIG_EXECUTABLE = "/usr/local/bin/swig40" }
+	.
+	+1,$g/^ *build-config *=/d
+	w
+	EOF
+    fi
+    ./build.sh
+)
+
+(   # sub shell
+    cd cargo
+    export OPENSSL_STATIC=1
+    if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" ]] ; then
+        export OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
+	export OPENSSL_INCLUDE_DIR=/usr/include/openssl
+    fi
+    cargo build --release
+)
 
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
-    git clone --single-branch --branch solana-tools-v1.38 https://github.com/solana-labs/newlib.git
-    echo "$( cd newlib && git rev-parse HEAD )  https://github.com/solana-labs/newlib.git" >> version.md
-    mkdir -p newlib_build
-    mkdir -p newlib_install
-    pushd newlib_build
-    CC="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/clang" \
-      AR="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ar" \
-      RANLIB="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ranlib" \
-      ../newlib/newlib/configure --target=sbf-solana-solana --host=sbf-solana --build="${HOST_TRIPLE}" --prefix="${OUT_DIR}/newlib_install"
-    make install
-    popd
+    git_clone newlib
+    mkdir -p newlib_{build,install}
+    (   # sub shell
+        cd newlib_build
+	(   # sub sub shell
+	    export CC="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/clang"
+	    export AR="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ar"
+	    export RANLIB="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ranlib"
+	    [[ "${HOST_TRIPLE}" == *-freebsd ]] && export CC_FOR_BUILD='cc'
+	    ARGS=(
+	    --target=sbf-solana-solana
+	    --host=sbf-solana
+	    --build="${HOST_TRIPLE}"
+	    --prefix="${OUT_DIR}/newlib_install"
+	    )
+	    ../newlib/newlib/configure "${ARGS[@]}"
+	)
+	MAKE='make'
+	[[ "${HOST_TRIPLE}" == *-freebsd ]] && MAKE='gmake'
+	"${MAKE}" install
+    )
 fi
 
 # Copy rust build products
@@ -85,13 +140,7 @@ cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/src/rust/library" deploy/rus
 
 # Copy llvm build products
 mkdir -p deploy/llvm/{bin,lib}
-while IFS= read -r f
-do
-    bin_file="rust/build/${HOST_TRIPLE}/llvm/build/bin/${f}${EXE_SUFFIX}"
-    if [[ -f "$bin_file" ]] ; then
-        cp -R "$bin_file" deploy/llvm/bin/
-    fi
-done < <(cat <<EOF
+FILES=(
 clang
 clang++
 clang-cl
@@ -109,8 +158,14 @@ llvm-objcopy
 llvm-objdump
 llvm-readelf
 llvm-readobj
-EOF
-         )
+)
+for FILE in "${FILES[@]}"; do
+    bin_file="rust/build/${HOST_TRIPLE}/llvm/build/bin/${FILE}${EXE_SUFFIX}"
+    if [[ -f "$bin_file" ]] ; then
+        cp -R "$bin_file" deploy/llvm/bin/
+    fi
+done
+
 cp -R "rust/build/${HOST_TRIPLE}/llvm/build/lib/clang" deploy/llvm/lib/
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
     cp -R newlib_install/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/
@@ -121,22 +176,17 @@ if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
 fi
 
 # Check the Rust binaries
-while IFS= read -r f
-do
-    "./deploy/rust/bin/${f}${EXE_SUFFIX}" --version
-done < <(cat <<EOF
+FILES=(
 cargo
 rustc
 rustdoc
-EOF
-         )
+)
+for FILE in "${FILES[@]}"; do
+    "./deploy/rust/bin/${FILE}${EXE_SUFFIX}" --version
+done
+
 # Check the LLVM binaries
-while IFS= read -r f
-do
-    if [[ -f "./deploy/llvm/bin/${f}${EXE_SUFFIX}" ]] ; then
-        "./deploy/llvm/bin/${f}${EXE_SUFFIX}" --version
-    fi
-done < <(cat <<EOF
+FILES=(
 clang
 clang++
 clang-cl
@@ -150,17 +200,21 @@ llvm-objdump
 llvm-readelf
 llvm-readobj
 solana-lldb
-EOF
-         )
+)
+for FILE in "${FILES[@]}"; do
+    if [[ -f "./deploy/llvm/bin/${FILE}${EXE_SUFFIX}" ]] ; then
+        "./deploy/llvm/bin/${FILE}${EXE_SUFFIX}" --version
+    fi
+done
 
 tar -C deploy -jcf ${ARTIFACT} .
 rm -rf deploy
 
 # Package LLVM binaries for Move project
-MOVE_DEV_TAR=${ARTIFACT/platform-tools/move-dev}
+MOVE_DEV_TAR="${ARTIFACT/platform-tools/move-dev}"
 mkdir move-dev
 if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
-    rm -f rust/build/${HOST_TRIPLE}/llvm/bin/{llvm-ranlib.exe,llvm-lib.exe,llvm-dlltool.exe}
+    rm -f rust/build/"${HOST_TRIPLE}"/llvm/bin/llvm-{ranlib,lib,dlltool}.exe}
 fi
 cp -R "rust/build/${HOST_TRIPLE}/llvm/"{bin,include,lib} move-dev/
 tar -jcf "${MOVE_DEV_TAR}" move-dev
