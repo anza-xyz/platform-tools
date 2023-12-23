@@ -5,7 +5,7 @@ unameOut="$(uname -s)"
 case "${unameOut}" in
     Darwin*)
         EXE_SUFFIX=
-        if [[ "$(uname -m)" == "arm64" ]] ; then
+        if [[ "$(uname -m)" == "arm64" ]] || [[ "$(uname -m)" == "aarch64" ]]; then
             HOST_TRIPLE=aarch64-apple-darwin
             ARTIFACT=platform-tools-osx-aarch64.tar.bz2
         else
@@ -18,7 +18,7 @@ case "${unameOut}" in
         ARTIFACT=platform-tools-windows-x86_64.tar.bz2;;
     Linux* | *)
         EXE_SUFFIX=
-        if [[ "$(uname -m)" == "arm64" ]] ; then
+        if [[ "$(uname -m)" == "arm64" ]] || [[ "$(uname -m)" == "aarch64" ]]; then
             HOST_TRIPLE=aarch64-unknown-linux-gnu
             ARTIFACT=platform-tools-linux-aarch64.tar.bz2
         else
