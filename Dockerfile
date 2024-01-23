@@ -9,14 +9,14 @@ LABEL maintainer "Solana Maintainers"
 #RUN gpg --no-tty --keyserver hkp://pgp.mit.edu --recv 0x2D2CEF1034921684
 
 # Install build dependencies of rust.
-# First, Update the apt's source list and include the sources of the packages.
-RUN grep deb /etc/apt/sources.list | \
-    sed 's/^deb/deb-src /g' >> /etc/apt/sources.list
+# Replace the original sources.list with archive.debian.org, since as of April 2023, Debian stretch has been moved there from the main repository
+RUN echo "deb http://archive.debian.org/debian stretch main contrib non-free" > /etc/apt/sources.list
 
 # Install compiler, python and subversion.
 RUN apt-get update && \
     apt-get install -y \
                     --no-install-recommends \
+                    --allow-downgrades \
                     ca-certificates gnupg \
                     build-essential \
                     python \
@@ -29,7 +29,9 @@ RUN apt-get update && \
                     clang \
                     ssh \
                     openssl \
-                    libssl-dev && \
+                    libssl1.1=1.1.0l-1~deb9u1 \
+                    libssl-dev \
+                    python3 && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get update && \
     apt-get install -y pkg-config
