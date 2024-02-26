@@ -1,6 +1,6 @@
 # Customized Rust/Clang toolchain for Solana Platform
 
-[![Build Status](https://github.com/solana-labs/platform-tools/actions/workflows/main.yml/badge.svg)](https://github.com/solana-labs/platform-tools/actions/)
+[![Build Status](https://github.com/anza-xyz/platform-tools/actions/workflows/main.yml/badge.svg)](https://github.com/anza-xyz/platform-tools/actions/)
 
 Builds Clang and Rust compiler binaries that incorporate
 customizations and fixes required by Solana but not yet upstreamed
@@ -25,11 +25,11 @@ ignored.
 
 This repo depends on the following:
 
-* https://github.com/solana-labs/rust
-* https://github.com/solana-labs/llvm-project
-* https://github.com/solana-labs/compiler-builtins
-* https://github.com/solana-labs/newlib
-* https://github.com/solana-labs/cargo
+* https://github.com/anza-xyz/rust
+* https://github.com/anza-xyz/llvm-project
+* https://github.com/anza-xyz/compiler-builtins
+* https://github.com/anza-xyz/newlib
+* https://github.com/anza-xyz/cargo
 
 Any changes that need to go into a Rust release must be made in the
 appropriate repos listed above.
