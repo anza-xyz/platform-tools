@@ -20,6 +20,7 @@ jobs:
       matrix:
         include:
         - target: x86_64-unknown-linux-gnu
+          arch: x86_64
           os: ubuntu-20.04
           ninja_file: ninja-linux.zip
           ninja_sha: b901ba96e486dce377f9a070ed4ef3f79deb45f4ffe2938f8e7ddc69cfb3df77
@@ -29,6 +30,7 @@ jobs:
           tar: linux
           out_dir: out
         - target: aarch64-apple-darwin
+          arch: aarch64
           os: macos-latest
           ninja_file: ninja-mac.zip
           ninja_sha: 482ecb23c59ae3d4f158029112de172dd96bb0e97549c4b1ca32d8fad11f873e
@@ -38,6 +40,7 @@ jobs:
           tar: osx
           out_dir: out
         - target: x86_64-pc-windows-msvc
+          arch: x86_64
           os: windows-latest
           ninja_file: ninja-win.zip
           ninja_sha: 524b344a1a9a55005eaf868d991e090ab8ce07fa109f1820d40e74642e289abc
@@ -60,23 +63,20 @@ jobs:
         ${{ matrix.ninja_sudo }} unzip ${{ matrix.ninja_file }} -d ${{ matrix.ninja_dir }} && rm ${{ matrix.ninja_file }}
       shell: bash
     - name: Install Rust
-      run: |
-        rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
-        rustup target add ${{ matrix.target }}
-      shell: bash
+      uses: dtolnay/rust-toolchain@stable
     - name: Build
       run: ./build.sh ${{ matrix.out_dir }}
       shell: bash
     - name: Upload ${{ matrix.tar }} tarball
       uses: actions/upload-artifact@v3
       with:
-        name: platform-tools-${{ matrix.tar }}-x86_64.tar.bz2
-        path: platform-tools-${{ matrix.tar }}-x86_64.tar.bz2
+        name: platform-tools-${{ matrix.tar }}-${{ matrix.arch }}.tar.bz2
+        path: platform-tools-${{ matrix.tar }}-${{ matrix.arch }}.tar.bz2
     - name: Upload move-dev ${{ matrix.tar }} tarball
       uses: actions/upload-artifact@v3
       with:
-        name: move-dev-${{ matrix.tar }}-x86_64.tar.bz2
-        path: move-dev-${{ matrix.tar }}-x86_64.tar.bz2
+        name: move-dev-${{ matrix.tar }}-${{ matrix.arch }}.tar.bz2
+        path: move-dev-${{ matrix.tar }}-${{ matrix.arch }}.tar.bz2
 
   release:
     name: Upload Release Assets
@@ -95,11 +95,11 @@ jobs:
     - name: Download macOS tarball
       uses: actions/download-artifact@v3
       with:
-        name: platform-tools-osx-x86_64.tar.bz2
+        name: platform-tools-osx-aarch.tar.bz2
     - name: Download macOS move-dev
       uses: actions/download-artifact@v3
       with:
-        name: move-dev-osx-x86_64.tar.bz2
+        name: move-dev-osx-aarch64.tar.bz2
     - name: Download Windows tarball
       uses: actions/download-artifact@v3
       with:
@@ -145,8 +145,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: platform-tools-osx-x86_64.tar.bz2
-        asset_name: platform-tools-osx-x86_64.tar.bz2
+        asset_path: platform-tools-osx-aarch64.tar.bz2
+        asset_name: platform-tools-osx-aarch64.tar.bz2
         asset_content_type: application/zip
     - name: Release macOS move-dev
       id: upload-release-macos-move
@@ -155,8 +155,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: move-dev-osx-x86_64.tar.bz2
-        asset_name: move-dev-osx-x86_64.tar.bz2
+        asset_path: move-dev-osx-aarch64.tar.bz2
+        asset_name: move-dev-osx-aarch64.tar.bz2
         asset_content_type: application/zip
     - name: Release Windows tarball
       id: upload-release-windows
