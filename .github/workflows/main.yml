@@ -28,7 +28,7 @@ jobs:
           rust: stable
           tar: linux
           out_dir: out
-        - target: x86_64-apple-darwin
+        - target: aarch64-apple-darwin
           os: macos-latest
           ninja_file: ninja-mac.zip
           ninja_sha: 482ecb23c59ae3d4f158029112de172dd96bb0e97549c4b1ca32d8fad11f873e

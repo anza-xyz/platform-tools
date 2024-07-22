@@ -28,7 +28,7 @@ case "${unameOut}" in
 esac
 
 cd "$(dirname "$0")"
-OUT_DIR=$(realpath "${1:-out}")
+OUT_DIR="$(realpath ./)/${1:-out}"
 
 rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
