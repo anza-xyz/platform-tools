@@ -51,9 +51,9 @@ jobs:
           out_dir: /c/out
     steps:
     - uses: actions/checkout@v1
-    - name: Install coreutils
+    - name: Install coreutils and swig
       run: |
-        brew update && brew install coreutils
+        brew update && brew install coreutils && brew install swig
       if: matrix.os == 'macos-latest'
       shell: bash
     - name: Install Ninja
