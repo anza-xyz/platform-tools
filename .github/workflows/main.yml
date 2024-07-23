@@ -95,7 +95,7 @@ jobs:
     - name: Download macOS tarball
       uses: actions/download-artifact@v3
       with:
-        name: platform-tools-osx-aarch.tar.bz2
+        name: platform-tools-osx-aarch64.tar.bz2
     - name: Download macOS move-dev
       uses: actions/download-artifact@v3
       with:
