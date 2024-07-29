@@ -63,7 +63,9 @@ jobs:
         ${{ matrix.ninja_sudo }} unzip ${{ matrix.ninja_file }} -d ${{ matrix.ninja_dir }} && rm ${{ matrix.ninja_file }}
       shell: bash
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: 1.79.0
     - name: Build
       run: ./build.sh ${{ matrix.out_dir }}
       shell: bash
