@@ -56,6 +56,10 @@ jobs:
         brew update && brew install coreutils && brew install swig
       if: matrix.os == 'macos-latest'
       shell: bash
+    - name: Install Linux tools for LLDB
+      run: |
+        sudo apt-get install build-essential swig python3-dev libedit-dev libncurses5-dev libxml2-dev
+      if: matrix.os == 'ubuntu-22.04'
     - name: Install Ninja
       run: |
         curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.11.1/${{ matrix.ninja_file }}" && \
