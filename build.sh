@@ -120,7 +120,7 @@ if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
     if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" || "${HOST_TRIPLE}" == "aarch64-unknown-linux-gnu" ]]; then
         cp -r rust/build/${HOST_TRIPLE}/llvm/local/lib/python* deploy/llvm/lib
     else
-        cp -R rust/build/${HOST_TRIPLE}/llvm/lib/python* deploy/llvm/lib/
+        [[ -e rust/build/${HOST_TRIPLE}/llvm/lib/python* ]] && cp -R rust/build/${HOST_TRIPLE}/llvm/lib/python* deploy/llvm/lib/
     fi
 fi
 
