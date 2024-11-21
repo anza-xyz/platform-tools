@@ -63,8 +63,8 @@ jobs:
     - uses: actions/checkout@v1
     - name: Install coreutils and swig
       run: |
-        brew update && brew install coreutils && brew install swig
-      if: matrix.os == 'macos-latest'
+        brew update && brew install coreutils swig ninja
+      if: matrix.tar == 'osx'
       shell: bash
     - name: Install Linux tools for LLDB
       run: |
@@ -75,6 +75,7 @@ jobs:
         curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.11.1/${{ matrix.ninja_file }}" && \
         echo "${{ matrix.ninja_sha }} ${{ matrix.ninja_file }}" | sha256sum -c && \
         ${{ matrix.ninja_sudo }} unzip ${{ matrix.ninja_file }} -d ${{ matrix.ninja_dir }} && rm ${{ matrix.ninja_file }}
+      if: matrix.tar != 'osx'
       shell: bash
     - name: Install Rust
       uses: dtolnay/rust-toolchain@master
