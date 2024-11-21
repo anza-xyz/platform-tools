@@ -39,6 +39,16 @@ jobs:
           rust: stable
           tar: osx
           out_dir: out
+        - target: x86_64-apple-darwin
+          arch: x86_64
+          os: macos-13
+          ninja_file: ninja-mac.zip
+          ninja_sha: 482ecb23c59ae3d4f158029112de172dd96bb0e97549c4b1ca32d8fad11f873e
+          ninja_dir: /usr/local/bin
+          ninja_sudo: sudo
+          rust: stable
+          tar: osx
+          out_dir: out
         - target: x86_64-pc-windows-msvc
           arch: x86_64
           os: windows-latest
@@ -53,8 +63,8 @@ jobs:
     - uses: actions/checkout@v1
     - name: Install coreutils and swig
       run: |
-        brew update && brew install coreutils && brew install swig
-      if: matrix.os == 'macos-latest'
+        brew update && brew install coreutils swig ninja
+      if: matrix.tar == 'osx'
       shell: bash
     - name: Install Linux tools for LLDB
       run: |
@@ -65,6 +75,7 @@ jobs:
         curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.11.1/${{ matrix.ninja_file }}" && \
         echo "${{ matrix.ninja_sha }} ${{ matrix.ninja_file }}" | sha256sum -c && \
         ${{ matrix.ninja_sudo }} unzip ${{ matrix.ninja_file }} -d ${{ matrix.ninja_dir }} && rm ${{ matrix.ninja_file }}
+      if: matrix.tar != 'osx'
       shell: bash
     - name: Install Rust
       uses: dtolnay/rust-toolchain@master
