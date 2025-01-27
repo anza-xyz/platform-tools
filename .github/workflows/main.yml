@@ -23,7 +23,15 @@ jobs:
           arch: x86_64
           os: ubuntu-22.04
           ninja_file: ninja-linux.zip
-          ninja_sha: b901ba96e486dce377f9a070ed4ef3f79deb45f4ffe2938f8e7ddc69cfb3df77
+          ninja_dir: /usr/local/bin
+          ninja_sudo: sudo
+          rust: stable
+          tar: linux
+          out_dir: out
+        - target: aarch64-unknown-linux-gnu
+          arch: aarch64
+          os: ubuntu-22.04-arm
+          ninja_file: ninja-linux-aarch64.zip
           ninja_dir: /usr/local/bin
           ninja_sudo: sudo
           rust: stable
@@ -33,7 +41,6 @@ jobs:
           arch: aarch64
           os: macos-latest
           ninja_file: ninja-mac.zip
-          ninja_sha: 482ecb23c59ae3d4f158029112de172dd96bb0e97549c4b1ca32d8fad11f873e
           ninja_dir: /usr/local/bin
           ninja_sudo: sudo
           rust: stable
@@ -43,7 +50,6 @@ jobs:
           arch: x86_64
           os: macos-13
           ninja_file: ninja-mac.zip
-          ninja_sha: 482ecb23c59ae3d4f158029112de172dd96bb0e97549c4b1ca32d8fad11f873e
           ninja_dir: /usr/local/bin
           ninja_sudo: sudo
           rust: stable
@@ -53,7 +59,6 @@ jobs:
           arch: x86_64
           os: windows-latest
           ninja_file: ninja-win.zip
-          ninja_sha: 524b344a1a9a55005eaf868d991e090ab8ce07fa109f1820d40e74642e289abc
           ninja_dir: /usr/bin
           ninja_sudo:
           rust: stable
@@ -72,8 +77,7 @@ jobs:
       if: matrix.os == 'ubuntu-22.04'
     - name: Install Ninja
       run: |
-        curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.11.1/${{ matrix.ninja_file }}" && \
-        echo "${{ matrix.ninja_sha }} ${{ matrix.ninja_file }}" | sha256sum -c && \
+        curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.12.1/${{ matrix.ninja_file }}" && \
         ${{ matrix.ninja_sudo }} unzip ${{ matrix.ninja_file }} -d ${{ matrix.ninja_dir }} && rm ${{ matrix.ninja_file }}
       if: matrix.tar != 'osx'
       shell: bash
