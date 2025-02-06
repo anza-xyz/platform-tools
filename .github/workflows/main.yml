@@ -89,12 +89,12 @@ jobs:
       run: ./build.sh ${{ matrix.out_dir }}
       shell: bash
     - name: Upload ${{ matrix.tar }} tarball
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: platform-tools-${{ matrix.tar }}-${{ matrix.arch }}.tar.bz2
         path: platform-tools-${{ matrix.tar }}-${{ matrix.arch }}.tar.bz2
     - name: Upload move-dev ${{ matrix.tar }} tarball
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: move-dev-${{ matrix.tar }}-${{ matrix.arch }}.tar.bz2
         path: move-dev-${{ matrix.tar }}-${{ matrix.arch }}.tar.bz2
