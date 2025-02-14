@@ -78,6 +78,10 @@ cp -R "cargo/target/release/cargo${EXE_SUFFIX}" deploy/rust/bin/
 mkdir -p deploy/rust/lib/rustlib/
 cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/${HOST_TRIPLE}" deploy/rust/lib/rustlib/
 cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbf-solana-solana" deploy/rust/lib/rustlib/
+cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpf-solana-solana" deploy/rust/lib/rustlib/
+cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv1-solana-solana" deploy/rust/lib/rustlib/
+cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv2-solana-solana" deploy/rust/lib/rustlib/
+cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv3-solana-solana" deploy/rust/lib/rustlib/
 find . -maxdepth 6 -type f -path "./rust/build/${HOST_TRIPLE}/stage1/lib/*" -exec cp {} deploy/rust/lib \;
 mkdir -p deploy/rust/lib/rustlib/src/rust
 cp "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/src/rust/Cargo.lock" deploy/rust/lib/rustlib/src/rust
