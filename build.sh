@@ -59,13 +59,47 @@ popd
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
     git clone --single-branch --branch solana-tools-v1.44 https://github.com/anza-xyz/newlib.git
     echo "$( cd newlib && git rev-parse HEAD )  https://github.com/anza-xyz/newlib.git" >> version.md
-    mkdir -p newlib_build
-    mkdir -p newlib_install
-    pushd newlib_build
+
+    mkdir -p newlib_build_v0
+    mkdir -p newlib_v0
+    pushd newlib_build_v0
     CC="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/clang" \
       AR="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ar" \
       RANLIB="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ranlib" \
-      ../newlib/newlib/configure --target=sbf-solana-solana --host=sbf-solana --build="${HOST_TRIPLE}" --prefix="${OUT_DIR}/newlib_install"
+      ../newlib/newlib/configure --target=sbf-solana-solana --host=sbf-solana --build="${HOST_TRIPLE}" --prefix="${OUT_DIR}/newlib_v0"
+    make install
+    popd
+
+    mkdir -p newlib_build_v1
+    mkdir -p newlib_v1
+    pushd newlib_build_v1
+    CFLAGS="-mcpu=v1" \
+    CC="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/clang" \
+      AR="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ar" \
+      RANLIB="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ranlib" \
+      ../newlib/newlib/configure --target=sbf-solana-solana --host=sbf-solana --build="${HOST_TRIPLE}" --prefix="${OUT_DIR}/newlib_v1"
+    make install
+    popd
+
+    mkdir -p newlib_build_v2
+    mkdir -p newlib_v2
+    pushd newlib_build_v2
+    CFLAGS="-mcpu=v2" \
+    CC="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/clang" \
+      AR="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ar" \
+      RANLIB="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ranlib" \
+      ../newlib/newlib/configure --target=sbf-solana-solana --host=sbf-solana --build="${HOST_TRIPLE}" --prefix="${OUT_DIR}/newlib_v2"
+    make install
+    popd
+
+    mkdir -p newlib_build_v3
+    mkdir -p newlib_v3
+    pushd newlib_build_v3
+    CFLAGS="-mcpu=v3" \
+    CC="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/clang" \
+      AR="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ar" \
+      RANLIB="${OUT_DIR}/rust/build/${HOST_TRIPLE}/llvm/bin/llvm-ranlib" \
+      ../newlib/newlib/configure --target=sbf-solana-solana --host=sbf-solana --build="${HOST_TRIPLE}" --prefix="${OUT_DIR}/newlib_v3"
     make install
     popd
 fi
@@ -117,8 +151,29 @@ EOF
          )
 cp -R "rust/build/${HOST_TRIPLE}/llvm/build/lib/clang" deploy/llvm/lib/
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
-    cp -R newlib_install/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/
-    cp -R newlib_install/sbf-solana/include deploy/llvm/
+    cp -R newlib_v0/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/
+    cp -R newlib_v0/sbf-solana/include deploy/llvm/
+    
+    mkdir -p deploy/llvm/lib/sbpf
+    mkdir -p deploy/llvm/sbpf
+    cp -R newlib_v0/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/sbpf/
+    cp -R newlib_v0/sbf-solana/include deploy/llvm/sbpf/    
+
+    mkdir -p deploy/llvm/lib/sbpfv1
+    mkdir -p deploy/llvm/sbpfv1
+    cp -R newlib_v1/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/sbpfv1/
+    cp -R newlib_v1/sbf-solana/include deploy/llvm/sbpfv1/
+
+    mkdir -p deploy/llvm/lib/sbpfv2
+    mkdir -p deploy/llvm/sbpfv2
+    cp -R newlib_v2/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/sbpfv2/
+    cp -R newlib_v2/sbf-solana/include deploy/llvm/sbpfv2/
+
+    mkdir -p deploy/llvm/lib/sbpfv3
+    mkdir -p deploy/llvm/sbpfv3
+    cp -R newlib_v3/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/sbpfv3/
+    cp -R newlib_v3/sbf-solana/include deploy/llvm/sbpfv3/
+
     cp -R rust/src/llvm-project/lldb/scripts/solana/* deploy/llvm/bin/
     cp -R rust/build/${HOST_TRIPLE}/llvm/lib/liblldb.* deploy/llvm/lib/
     if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" || "${HOST_TRIPLE}" == "aarch64-unknown-linux-gnu" ]]; then
