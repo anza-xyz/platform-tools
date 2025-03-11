@@ -75,6 +75,8 @@ pushd rust
 if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
     # Do not build lldb on Windows
     sed -i -e 's#enable-projects = \"clang;lld;lldb\"#enable-projects = \"clang;lld\"#g' config.toml
+    # Do not optimize for size on Windows
+    sed -i -e 's#optimize = \"s\"#optimize = true#g' config.toml
 fi
 ./build.sh
 popd
