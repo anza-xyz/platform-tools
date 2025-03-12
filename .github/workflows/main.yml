@@ -78,7 +78,7 @@ jobs:
     - name: Install Ninja
       run: |
         curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.12.1/${{ matrix.ninja_file }}" && \
-        ${{ matrix.ninja_sudo }} unzip ${{ matrix.ninja_file }} -d ${{ matrix.ninja_dir }} && rm ${{ matrix.ninja_file }}
+        ${{ matrix.ninja_sudo }} unzip -o ${{ matrix.ninja_file }} -d ${{ matrix.ninja_dir }} && rm ${{ matrix.ninja_file }}
       if: matrix.tar != 'osx'
       shell: bash
     - name: Install Rust
