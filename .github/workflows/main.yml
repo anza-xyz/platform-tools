@@ -75,6 +75,11 @@ jobs:
       run: |
         sudo apt-get install build-essential swig python3-dev libedit-dev libncurses5-dev libxml2-dev
       if: matrix.os == 'ubuntu-22.04'
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      if: matrix.os == 'ubuntu-22.04'
+      with:
+        tool-cache: false
     - name: Install Ninja
       run: |
         curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.12.1/${{ matrix.ninja_file }}" && \
