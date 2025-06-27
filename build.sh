@@ -100,6 +100,8 @@ if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
     build_newlib "v4"
 fi
 
+echo "1.84.1-sbpf-solana-v1.50" >> version.md
+
 # Copy rust build products
 mkdir -p deploy/rust
 cp version.md deploy/
