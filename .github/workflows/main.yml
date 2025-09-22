@@ -71,27 +71,16 @@ jobs:
         brew update && brew install coreutils swig ninja
       if: matrix.tar == 'osx'
       shell: bash
-    - name: Install Linux tools for LLDB
-      run: |
-        sudo apt-get install build-essential swig python3-dev libedit-dev libncurses5-dev libxml2-dev
-      if: matrix.os == 'ubuntu-22.04'
     - name: Free Disk Space (Ubuntu)
       uses: jlumbroso/free-disk-space@main
       if: matrix.os == 'ubuntu-22.04'
       with:
         tool-cache: false
-    - name: Install Ninja
-      run: |
-        curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.12.1/${{ matrix.ninja_file }}" && \
-        ${{ matrix.ninja_sudo }} unzip -o ${{ matrix.ninja_file }} -d ${{ matrix.ninja_dir }} && rm ${{ matrix.ninja_file }}
-      if: matrix.tar != 'osx'
-      shell: bash
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@master
+    - uses: cachix/install-nix-action@v31
       with:
-        toolchain: 1.89.0
+        nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/871b9fd269ff6246794583ce4ee1031e1da71895.tar.gz
     - name: Build
-      run: ./build.sh ${{ matrix.out_dir }}
+      run: ./build.sh --nix ${{ matrix.out_dir }}
       shell: bash
     - name: Upload ${{ matrix.tar }} tarball
       uses: actions/upload-artifact@v4

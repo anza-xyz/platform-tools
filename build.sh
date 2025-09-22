@@ -1,13 +1,21 @@
 #!/usr/bin/env bash
 set -ex
 
+WITH_NIX=
+case "$1" in
+    --nix)
+        WITH_NIX="--nix"
+        shift
+        ;;
+esac
+
 function build_newlib() {
     mkdir -p newlib_build_"$1"
     mkdir -p newlib_"$1"
     pushd newlib_build_"$1"
 
     local c_flags="-O2"
-    if [[ "$1" != "v0" ]] ; then 
+    if [[ "$1" != "v0" ]] ; then
       c_flags="${c_flags} -mcpu=$1"
     fi
 
@@ -29,7 +37,7 @@ function copy_newlib() {
     mkdir -p deploy/llvm/lib/sbpf"${folder_name}"
     mkdir -p deploy/llvm/sbpf"${folder_name}"
     cp -R newlib_"$1"/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/sbpf"${folder_name}"/
-    cp -R newlib_"$1"/sbf-solana/include deploy/llvm/sbpf"${folder_name}"/    
+    cp -R newlib_"$1"/sbf-solana/include deploy/llvm/sbpf"${folder_name}"/
 }
 
 unameOut="$(uname -s)"
@@ -81,14 +89,18 @@ if [[ "${HOST_TRIPLE}" == *"apple"* ]]; then
     ./src/llvm-project/lldb/scripts/macos-setup-codesign.sh
 fi
 
-./build.sh
+./build.sh $WITH_NIX
 popd
 
 pushd cargo
-if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" ]] ; then
-    OPENSSL_STATIC=1 OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu OPENSSL_INCLUDE_DIR=/usr/include/openssl cargo build --release
+if [[ "${WITH_NIX}" == "--nix" ]] ; then
+    nix-shell shell.nix --pure --run "cargo build --release"
 else
-    OPENSSL_STATIC=1 cargo build --release
+    if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" ]] ; then
+        OPENSSL_STATIC=1 OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu OPENSSL_INCLUDE_DIR=/usr/include/openssl cargo build --release
+    else
+        OPENSSL_STATIC=1 cargo build --release
+    fi
 fi
 popd
 
@@ -150,7 +162,7 @@ cp -R "rust/build/${HOST_TRIPLE}/llvm/build/lib/clang" deploy/llvm/lib/
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
     cp -R newlib_v0/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/
     cp -R newlib_v0/sbf-solana/include deploy/llvm/
-    
+
     copy_newlib "v0"
     copy_newlib "v1"
     copy_newlib "v2"
