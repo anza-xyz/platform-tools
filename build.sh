@@ -76,6 +76,11 @@ if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
     # Do not build lldb on Windows
     sed -i -e 's#enable-projects = \"clang;lld;lldb\"#enable-projects = \"clang;lld\"#g' bootstrap.toml
 fi
+
+if [[ "${HOST_TRIPLE}" == *"apple"* ]]; then
+    ./src/llvm-project/lldb/scripts/macos-setup-codesign.sh
+fi
+
 ./build.sh
 popd
 
