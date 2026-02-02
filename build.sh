@@ -65,10 +65,10 @@ rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
 pushd "${OUT_DIR}"
 
-git clone --single-branch --branch solana-tools-v1.52 --recurse-submodules --shallow-submodules https://github.com/anza-xyz/rust.git
+git clone --single-branch --branch solana-tools-v1.53 --recurse-submodules --shallow-submodules https://github.com/anza-xyz/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/anza-xyz/rust.git" >> version.md
 
-git clone --single-branch --branch solana-tools-v1.52 https://github.com/anza-xyz/cargo.git
+git clone --single-branch --branch solana-tools-v1.53 https://github.com/anza-xyz/cargo.git
 echo "$( cd cargo && git rev-parse HEAD )  https://github.com/anza-xyz/cargo.git" >> version.md
 
 pushd rust
@@ -93,12 +93,13 @@ fi
 popd
 
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
-    git clone --single-branch --branch solana-tools-v1.52 https://github.com/anza-xyz/newlib.git
+    git clone --single-branch --branch solana-tools-v1.53 https://github.com/anza-xyz/newlib.git
     echo "$( cd newlib && git rev-parse HEAD )  https://github.com/anza-xyz/newlib.git" >> version.md
 
     build_newlib "v0"
     build_newlib "v1"
     build_newlib "v2"
+    build_newlib "v3"
 fi
 
 # Copy rust build products
@@ -108,10 +109,10 @@ cp -R "rust/build/${HOST_TRIPLE}/stage1/bin" deploy/rust/
 cp -R "cargo/target/release/cargo${EXE_SUFFIX}" deploy/rust/bin/
 mkdir -p deploy/rust/lib/rustlib/
 cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/${HOST_TRIPLE}" deploy/rust/lib/rustlib/
-cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbf-solana-solana" deploy/rust/lib/rustlib/
 cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpf-solana-solana" deploy/rust/lib/rustlib/
 cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv1-solana-solana" deploy/rust/lib/rustlib/
 cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv2-solana-solana" deploy/rust/lib/rustlib/
+cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv3-solana-solana" deploy/rust/lib/rustlib/
 find . -maxdepth 6 -type f -path "./rust/build/${HOST_TRIPLE}/stage1/lib/*" -exec cp {} deploy/rust/lib \;
 mkdir -p deploy/rust/lib/rustlib/src/rust
 cp "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/src/rust/Cargo.lock" deploy/rust/lib/rustlib/src/rust
@@ -153,6 +154,7 @@ if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
     copy_newlib "v0"
     copy_newlib "v1"
     copy_newlib "v2"
+    copy_newlib "v3"
 
     cp -R rust/src/llvm-project/lldb/scripts/solana/* deploy/llvm/bin/
     cp -R rust/build/${HOST_TRIPLE}/llvm/lib/liblldb.* deploy/llvm/lib/
