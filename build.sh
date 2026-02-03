@@ -73,7 +73,7 @@ rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
 pushd "${OUT_DIR}"
 
-git clone --single-branch --branch solana-tools-v1.53 --recurse-submodules --shallow-submodules https://github.com/anza-xyz/rust.git
+git clone --single-branch --branch mac-mig --recurse-submodules --shallow-submodules https://github.com/joncinque/rust.git
 echo "$( cd rust && git rev-parse HEAD )  https://github.com/anza-xyz/rust.git" >> version.md
 
 git clone --single-branch --branch solana-tools-v1.53 https://github.com/anza-xyz/cargo.git
