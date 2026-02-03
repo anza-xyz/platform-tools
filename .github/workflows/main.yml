@@ -17,6 +17,7 @@ jobs:
     needs: check
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false # while testing
       matrix:
         include:
         - target: x86_64-unknown-linux-gnu
@@ -51,11 +52,6 @@ jobs:
           out_dir: /c/out
     steps:
     - uses: actions/checkout@v1
-    - name: Install coreutils and swig
-      run: |
-        brew update && brew install coreutils swig
-      if: matrix.tar == 'osx'
-      shell: bash
     - name: Free Disk Space (Ubuntu)
       uses: jlumbroso/free-disk-space@main
       if: matrix.os == 'ubuntu-22.04'
