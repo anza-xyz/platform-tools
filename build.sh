@@ -73,32 +73,32 @@ rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
 pushd "${OUT_DIR}"
 
-git clone --single-branch --branch mac-mig --recurse-submodules --shallow-submodules https://github.com/joncinque/rust.git
-echo "$( cd rust && git rev-parse HEAD )  https://github.com/anza-xyz/rust.git" >> version.md
+#git clone --single-branch --branch mac-mig --recurse-submodules --shallow-submodules https://github.com/joncinque/rust.git
+#echo "$( cd rust && git rev-parse HEAD )  https://github.com/anza-xyz/rust.git" >> version.md
 
 git clone --single-branch --branch solana-tools-v1.53 https://github.com/anza-xyz/cargo.git
 echo "$( cd cargo && git rev-parse HEAD )  https://github.com/anza-xyz/cargo.git" >> version.md
 
-pushd rust
-if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
+#pushd rust
+#if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
     # Do not build lldb on Windows
-    sed -i -e 's#enable-projects = \"clang;lld;lldb\"#enable-projects = \"clang;lld\"#g' bootstrap.toml
-fi
+#    sed -i -e 's#enable-projects = \"clang;lld;lldb\"#enable-projects = \"clang;lld\"#g' bootstrap.toml
+#fi
 
-if [[ "${HOST_TRIPLE}" == *"apple"* ]]; then
-    ./src/llvm-project/lldb/scripts/macos-setup-codesign.sh
-fi
+#if [[ "${HOST_TRIPLE}" == *"apple"* ]]; then
+#    ./src/llvm-project/lldb/scripts/macos-setup-codesign.sh
+#fi
 
 #./build.sh $WITH_NIX
-popd
+#popd
 
 pushd cargo
 if [[ "${WITH_NIX}" == "--nix" ]] ; then
-    PURE_ARG="--pure"
     if [[ "$(uname)" == "Darwin" ]] ; then
-        PURE_ARG=""
+        nix-shell shell.nix --run "cargo build --release"
+    else
+        nix-shell shell.nix --pure --run "cargo build --release"
     fi
-    nix-shell shell.nix "${PURE_ARG}" --run "cargo build --release"
 else
     if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" ]] ; then
         OPENSSL_STATIC=1 OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu OPENSSL_INCLUDE_DIR=/usr/include/openssl cargo build --release
