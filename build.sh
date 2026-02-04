@@ -89,12 +89,16 @@ if [[ "${HOST_TRIPLE}" == *"apple"* ]]; then
     ./src/llvm-project/lldb/scripts/macos-setup-codesign.sh
 fi
 
-./build.sh $WITH_NIX
+#./build.sh $WITH_NIX
 popd
 
 pushd cargo
 if [[ "${WITH_NIX}" == "--nix" ]] ; then
-    nix-shell shell.nix --pure --run "cargo build --release"
+    PURE_ARG="--pure"
+    if [[ "$(uname)" == "Darwin" ]] ; then
+        PURE_ARG=""
+    fi
+    nix-shell shell.nix "${PURE_ARG}" --run "cargo build --release"
 else
     if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" ]] ; then
         OPENSSL_STATIC=1 OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu OPENSSL_INCLUDE_DIR=/usr/include/openssl cargo build --release
