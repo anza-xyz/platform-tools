@@ -73,24 +73,24 @@ rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
 pushd "${OUT_DIR}"
 
-#git clone --single-branch --branch mac-mig --recurse-submodules --shallow-submodules https://github.com/joncinque/rust.git
-#echo "$( cd rust && git rev-parse HEAD )  https://github.com/anza-xyz/rust.git" >> version.md
+git clone --single-branch --branch mac-mig --recurse-submodules --shallow-submodules https://github.com/joncinque/rust.git
+echo "$( cd rust && git rev-parse HEAD )  https://github.com/anza-xyz/rust.git" >> version.md
 
 git clone --single-branch --branch solana-tools-v1.53 https://github.com/anza-xyz/cargo.git
 echo "$( cd cargo && git rev-parse HEAD )  https://github.com/anza-xyz/cargo.git" >> version.md
 
-#pushd rust
-#if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
+pushd rust
+if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
     # Do not build lldb on Windows
-#    sed -i -e 's#enable-projects = \"clang;lld;lldb\"#enable-projects = \"clang;lld\"#g' bootstrap.toml
-#fi
+    sed -i -e 's#enable-projects = \"clang;lld;lldb\"#enable-projects = \"clang;lld\"#g' bootstrap.toml
+fi
 
-#if [[ "${HOST_TRIPLE}" == *"apple"* ]]; then
-#    ./src/llvm-project/lldb/scripts/macos-setup-codesign.sh
-#fi
+if [[ "${HOST_TRIPLE}" == *"apple"* ]]; then
+    ./src/llvm-project/lldb/scripts/macos-setup-codesign.sh
+fi
 
-#./build.sh $WITH_NIX
-#popd
+./build.sh $WITH_NIX
+popd
 
 pushd cargo
 if [[ "${WITH_NIX}" == "--nix" ]] ; then
@@ -171,11 +171,11 @@ if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
 
     cp -R rust/src/llvm-project/lldb/scripts/solana/* deploy/llvm/bin/
     cp -R rust/build/${HOST_TRIPLE}/llvm/lib/liblldb.* deploy/llvm/lib/
-    #if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" || "${HOST_TRIPLE}" == "aarch64-unknown-linux-gnu" ]]; then
-        #cp -R rust/build/${HOST_TRIPLE}/llvm/local/lib/python* deploy/llvm/lib
-    #else
-        #cp -R rust/build/${HOST_TRIPLE}/llvm/lib/python* deploy/llvm/lib/
-    #fi
+    if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" || "${HOST_TRIPLE}" == "aarch64-unknown-linux-gnu" ]]; then
+        cp -R rust/build/${HOST_TRIPLE}/llvm/local/lib/python* deploy/llvm/lib
+    else
+        cp -R rust/build/${HOST_TRIPLE}/llvm/lib/python* deploy/llvm/lib/
+    fi
 fi
 
 # Check the Rust binaries
