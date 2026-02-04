@@ -94,11 +94,8 @@ echo "$( cd cargo && git rev-parse HEAD )  https://github.com/anza-xyz/cargo.git
 
 pushd cargo
 if [[ "${WITH_NIX}" == "--nix" ]] ; then
-    if [[ "$(uname)" == "Darwin" ]] ; then
-        nix-shell shell.nix --run "cargo build --release"
-    else
-        nix-shell shell.nix --pure --run "cargo build --release"
-    fi
+    # NIX_SSL_CERT_FILE is required for Mac builds
+    nix-shell shell.nix --pure --keep NIX_SSL_CERT_FILE --run "cargo build --release"
 else
     if [[ "${HOST_TRIPLE}" == "x86_64-unknown-linux-gnu" ]] ; then
         OPENSSL_STATIC=1 OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu OPENSSL_INCLUDE_DIR=/usr/include/openssl cargo build --release
