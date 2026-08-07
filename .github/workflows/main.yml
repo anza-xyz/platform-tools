@@ -17,64 +17,41 @@ jobs:
     needs: check
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false # while testing
       matrix:
         include:
         - target: x86_64-unknown-linux-gnu
           arch: x86_64
           os: ubuntu-22.04
-          ninja_file: ninja-linux.zip
-          ninja_dir: /usr/local/bin
-          ninja_sudo: sudo
           rust: stable
           tar: linux
           out_dir: out
         - target: aarch64-unknown-linux-gnu
           arch: aarch64
           os: ubuntu-22.04-arm
-          ninja_file: ninja-linux-aarch64.zip
-          ninja_dir: /usr/local/bin
-          ninja_sudo: sudo
           rust: stable
           tar: linux
           out_dir: out
         - target: aarch64-apple-darwin
           arch: aarch64
           os: macos-latest
-          ninja_file: ninja-mac.zip
-          ninja_dir: /usr/local/bin
-          ninja_sudo: sudo
           rust: stable
           tar: osx
           out_dir: out
         - target: x86_64-apple-darwin
           arch: x86_64
           os: macos-15-intel
-          ninja_file: ninja-mac.zip
-          ninja_dir: /usr/local/bin
-          ninja_sudo: sudo
           rust: stable
           tar: osx
           out_dir: out
         - target: x86_64-pc-windows-msvc
           arch: x86_64
           os: windows-latest
-          ninja_file: ninja-win.zip
-          ninja_dir: /usr/bin
-          ninja_sudo:
           rust: stable
           tar: windows
           out_dir: /c/out
     steps:
     - uses: actions/checkout@v1
-    - name: Install coreutils and swig
-      run: |
-        brew update && brew install coreutils swig ninja
-      if: matrix.tar == 'osx'
-      shell: bash
-    - name: Install Linux tools for LLDB
-      run: |
-        sudo apt-get install build-essential swig python3-dev libedit-dev libncurses5-dev libxml2-dev
-      if: matrix.os == 'ubuntu-22.04'
     - name: Free Disk Space (Ubuntu)
       uses: jlumbroso/free-disk-space@main
       if: matrix.os == 'ubuntu-22.04'
@@ -82,17 +59,27 @@ jobs:
         tool-cache: false
     - name: Install Ninja
       run: |
-        curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.12.1/${{ matrix.ninja_file }}" && \
-        ${{ matrix.ninja_sudo }} unzip -o ${{ matrix.ninja_file }} -d ${{ matrix.ninja_dir }} && rm ${{ matrix.ninja_file }}
-      if: matrix.tar != 'osx'
+        curl -L -O "https://github.com/ninja-build/ninja/releases/download/v1.12.1/ninja-win.zip" && \
+        unzip -o ninja-win.zip -d /usr/bin && rm ninja-win.zip
+      if: matrix.tar == 'windows'
       shell: bash
     - name: Install Rust
       uses: dtolnay/rust-toolchain@master
       with:
         toolchain: 1.89.0
+      if: matrix.tar == 'windows'
     - name: Build
       run: ./build.sh ${{ matrix.out_dir }}
       shell: bash
+      if: matrix.tar == 'windows'
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/871b9fd269ff6246794583ce4ee1031e1da71895.tar.gz
+      if: matrix.tar != 'windows'
+    - name: Build
+      run: ./build.sh --nix ${{ matrix.out_dir }}
+      shell: bash
+      if: matrix.tar != 'windows'
     - name: Upload ${{ matrix.tar }} tarball
       uses: actions/upload-artifact@v4
       with:
