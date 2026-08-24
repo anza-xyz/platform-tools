@@ -52,12 +52,7 @@ Each platform-tools release pins a `solana-tools-v*` tag in [anza-xyz/rust].
 That tag fixes both the Rust version and the LLVM branch the release is built
 from.
 
-| platform-tools | Rust | LLVM | LLVM branch |
-| --- | --- | --- | --- |
-| v1.41 – v1.42 | 1.75.0 | 17.0 | `solana-rustc/17.0-2023-12-14` |
-| v1.43 – v1.46 | 1.79.0 | 18.1 | `solana-rustc/18.1-2024-05-19` |
-| v1.47 – v1.51 | 1.84.1 | 19.1 | `solana-rustc/19.1-2024-12-03` |
-| v1.52 – v1.56 | 1.89.0 | 20.1 | `solana-rustc/20.1-2025-02-13` |
+You can see these versions in the release notes.
 
 ### Target Architectures
 
