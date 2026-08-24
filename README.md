@@ -57,17 +57,9 @@ You can see these versions in the release notes.
 ### Target Architectures
 
 Each release ships one rustlib per target triple.  Which triples are shipped
-has changed over time:
+has changed over time.
 
-| Target triple | platform-tools | Description |
-| --- | --- | --- |
-| `sbf-solana-solana` | up to v1.52 | SBPFv0.  The original target name |
-| `sbpf-solana-solana` | v1.44 and later | SBPFv0.  Replaces `sbf-solana-solana` |
-| `sbpfv1-solana-solana` | v1.44 and later | SBPFv1 |
-| `sbpfv2-solana-solana` | v1.44 and later | SBPFv2 |
-| `sbpfv3-solana-solana` | v1.44 – v1.51 | SBPFv3 in name only.  Builds SBPFv2 semantics under a v3 header — see below |
-| `sbpfv3-solana-solana` | v1.53 and later | SBPFv3.  New linker script and memory layout |
-| `sbpfv4-solana-solana` | v1.50 – v1.51 | SBPFv4.  Shares the v3 linker script |
+The current target is `sbpfv3-solana-solana` (SBPFv3).
 
 You should not build SBPFv3 programs with v1.44 – v1.51. Those releases ship an
 `sbpfv3-solana-solana` rustlib, but a different LLVM definition, which is *not*
