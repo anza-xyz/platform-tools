@@ -61,21 +61,10 @@ has changed over time.
 
 The current target is `sbpfv3-solana-solana` (SBPFv3).
 
-You should not build SBPFv3 programs with v1.44 – v1.51. Those releases ship an
-`sbpfv3-solana-solana` rustlib, but a different LLVM definition, which is *not*
-the SBPFv3 supported by the Solana network.
-
-The invalid `Proc<"v3">` used by v1.44 – v1.51 defines the SBPFv2 feature set
-plus static syscalls and 64-bit absolute relocations. Most of this was reverted
-with the final SBPFv3 specification, which is comprised of the following SIMDs:
-
-- [SIMD-0178]: static syscalls, resolved at link time rather than load time
-- [SIMD-0189]: stricter ELF headers, with a fixed segment layout and order
-- [SIMD-0377]: eBPF ISA compatibility, adding JMP32, re-encoding `callx`, and
-  disabling stack frame gaps
-
-Those releases also ship the old linker script and emit `EM_SBF`
-unconditionally, so SBPFv3's stricter ELF header checks reject them.
+> **Do not build SBPFv3 programs with v1.44 – v1.51.**
+>
+> Those releases ship an `sbpfv3-solana-solana` rustlib, but a different LLVM
+> definition, which is *not* the SBPFv3 supported by the Solana network.
 
 v1.52 shipped no `sbpfv3-solana-solana` rustlib at all.
 
