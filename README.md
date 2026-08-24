@@ -68,11 +68,8 @@ The current target is `sbpfv3-solana-solana` (SBPFv3).
 
 v1.52 shipped no `sbpfv3-solana-solana` rustlib at all.
 
-From v1.53, `Proc<"v3">` is `[StaticSyscalls, RelocAbs64, Jmp32, CallxRegDst,
-NoStackGaps, StackGrowsUp]`. The linker script matches the current memory
-layout, and the object writer emits `EM_BPF`.
-
-Use v1.53 or later to build SBPFv3 programs.
+v1.53 and onward ship the correct `sbpfv3-solana-solana` target. Use v1.53 or
+later to build SBPFv3 programs.
 
 [anza-xyz/rust]: https://github.com/anza-xyz/rust
 [SIMD-0178]: https://github.com/solana-foundation/solana-improvement-documents/blob/main/proposals/0178-static-syscalls.md
