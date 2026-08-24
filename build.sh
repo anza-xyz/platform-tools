@@ -74,7 +74,7 @@ echo "$( cd cargo && git rev-parse HEAD )  https://github.com/anza-xyz/cargo.git
 pushd rust
 if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
     # Do not build lldb on Windows
-    sed -i -e 's#enable-projects = \"lld;lldb\"#enable-projects = \"lld\"#g' bootstrap.toml
+    sed -i -e 's#enable-projects = \"clang;lld;lldb\"#enable-projects = \"clang;lld\"#g' bootstrap.toml
 fi
 
 if [[ "${HOST_TRIPLE}" == *"apple"* ]]; then
