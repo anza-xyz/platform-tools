@@ -56,22 +56,20 @@ You can see these versions in the release notes.
 
 ### Target Architectures
 
-Each release ships one rustlib per target triple.  Which triples are shipped
-has changed over time.
+Each release ships support for a set of target triples.  Which triples are
+supported has changed over time.
 
 The current target is `sbpfv3-solana-solana` (SBPFv3).
 
+> [!IMPORTANT]
 > **Do not build SBPFv3 programs with v1.44 – v1.51.**
 >
-> Those releases ship an `sbpfv3-solana-solana` rustlib, but a different LLVM
+> Those releases ship an `sbpfv3-solana-solana` target, but a different LLVM
 > definition, which is *not* the SBPFv3 supported by the Solana network.
 
-v1.52 shipped no `sbpfv3-solana-solana` rustlib at all.
+v1.52 shipped without support for `sbpfv3-solana-solana`.
 
 v1.53 and onward ship the correct `sbpfv3-solana-solana` target. Use v1.53 or
 later to build SBPFv3 programs.
 
 [anza-xyz/rust]: https://github.com/anza-xyz/rust
-[SIMD-0178]: https://github.com/solana-foundation/solana-improvement-documents/blob/main/proposals/0178-static-syscalls.md
-[SIMD-0189]: https://github.com/solana-foundation/solana-improvement-documents/blob/main/proposals/0189-sbpf-stricter-elf-headers.md
-[SIMD-0377]: https://github.com/solana-foundation/solana-improvement-documents/blob/main/proposals/0377-ebpf-isa-compatibility.md
