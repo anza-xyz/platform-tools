@@ -91,6 +91,8 @@ jobs:
       with:
         toolchain: 1.84.1
     - name: Build
+      env:
+        CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER: rust-lld.exe
       run: ./build.sh ${{ matrix.out_dir }}
       shell: bash
     - name: Upload ${{ matrix.tar }} tarball
