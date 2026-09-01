@@ -66,14 +66,18 @@ jobs:
           out_dir: /c/out
     steps:
     - uses: actions/checkout@v1
-    - name: Install coreutils and swig
+    - name: Downgrade Python MacOS aarch64
       run: |
         brew update 
         brew install python@3.12
         brew unlink python@3.14 2>/dev/null || true
         brew link --force python@3.12
         echo "/opt/homebrew/opt/python@3.12/bin" >> "$GITHUB_PATH"
-        brew install coreutils swig ninja
+      if: matrix.target == 'aarch64-apple-darwin'
+      shell: bash
+    - name: Install coreutils and swig
+      run: |
+        brew update && brew install coreutils swig ninja
       if: matrix.tar == 'osx'
       shell: bash
     - name: Install Linux tools for LLDB
