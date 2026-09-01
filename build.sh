@@ -97,9 +97,6 @@ if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
     git clone --single-branch --branch solana-tools-v1.46.1 https://github.com/anza-xyz/newlib.git
     echo "$( cd newlib && git rev-parse HEAD )  https://github.com/anza-xyz/newlib.git" >> version.md
 
-    build_newlib "v0"
-    build_newlib "v1"
-    build_newlib "v2"
     build_newlib "v3"
 fi
 
@@ -110,9 +107,6 @@ cp -R "rust/build/${HOST_TRIPLE}/stage1/bin" deploy/rust/
 cp -R "cargo/target/release/cargo${EXE_SUFFIX}" deploy/rust/bin/
 mkdir -p deploy/rust/lib/rustlib/
 cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/${HOST_TRIPLE}" deploy/rust/lib/rustlib/
-cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpf-solana-solana" deploy/rust/lib/rustlib/
-cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv1-solana-solana" deploy/rust/lib/rustlib/
-cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv2-solana-solana" deploy/rust/lib/rustlib/
 cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv3-solana-solana" deploy/rust/lib/rustlib/
 find . -maxdepth 6 -type f -path "./rust/build/${HOST_TRIPLE}/stage1/lib/*" -exec cp {} deploy/rust/lib \;
 mkdir -p deploy/rust/lib/rustlib/src/rust
@@ -152,9 +146,6 @@ if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
     cp -R newlib_v0/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/
     cp -R newlib_v0/sbf-solana/include deploy/llvm/
     
-    copy_newlib "v0"
-    copy_newlib "v1"
-    copy_newlib "v2"
     copy_newlib "v3"
 
     cp -R rust/src/llvm-project/lldb/scripts/solana/* deploy/llvm/bin/
