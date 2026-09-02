@@ -143,8 +143,6 @@ EOF
          )
 cp -R "rust/build/${HOST_TRIPLE}/llvm/build/lib/clang" deploy/llvm/lib/
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
-    cp -R newlib_v0/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/
-    cp -R newlib_v0/sbf-solana/include deploy/llvm/
     
     copy_newlib "v3"
 
