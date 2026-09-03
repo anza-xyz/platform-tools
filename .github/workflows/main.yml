@@ -87,6 +87,7 @@ jobs:
       shell: bash
     - name: Install Linux tools for LLDB
       run: |
+        sudo apt-get update
         sudo apt-get install build-essential swig python3-dev libedit-dev libncurses5-dev libxml2-dev
       if: matrix.os == 'ubuntu-22.04'
     - name: Free Disk Space (Ubuntu)
