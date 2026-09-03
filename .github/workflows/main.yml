@@ -70,7 +70,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-      if: matrix.target == 'aarch64-apple-darwin'
+      if: matrix.tar == 'osx'
     - name: Downgrade Python MacOS aarch64
       run: |
         brew update 
