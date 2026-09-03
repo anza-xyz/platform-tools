@@ -65,16 +65,17 @@ rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
 pushd "${OUT_DIR}"
 
-git clone --single-branch --branch solana-tools-v1.57 --recurse-submodules --shallow-submodules https://github.com/anza-xyz/rust.git
-echo "$( cd rust && git rev-parse HEAD )  https://github.com/anza-xyz/rust.git" >> version.md
+git clone --single-branch --branch solana-tools-v1.42.1 --recurse-submodules --shallow-submodules https://github.com/anza-xyz/rust.git
+echo "$( cd rust && git rev-parse HEAD )  https://github.com/LucasSte/rust.git" >> version.md
 
-git clone --single-branch --branch solana-tools-v1.57 https://github.com/anza-xyz/cargo.git
+git clone --single-branch --branch solana-tools-v1.42.1 https://github.com/anza-xyz/cargo.git
 echo "$( cd cargo && git rev-parse HEAD )  https://github.com/anza-xyz/cargo.git" >> version.md
 
 pushd rust
 if [[ "${HOST_TRIPLE}" == "x86_64-pc-windows-msvc" ]] ; then
     # Do not build lldb on Windows
-    sed -i -e 's#enable-projects = \"lld;lldb\"#enable-projects = \"lld\"#g' bootstrap.toml
+    sed -i -e 's#enable-projects = \"clang;lld;lldb\"#enable-projects = \"clang;lld\"#g' config.toml
+    sed -i -e 's#targets = \"AArch64;X86\"#targets = \"X86"#g' config.toml
 fi
 
 if [[ "${HOST_TRIPLE}" == *"apple"* ]]; then
@@ -93,12 +94,9 @@ fi
 popd
 
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
-    git clone --single-branch --branch solana-tools-v1.57 https://github.com/anza-xyz/newlib.git
+    git clone --single-branch --branch solana-tools-v1.46.1 https://github.com/anza-xyz/newlib.git
     echo "$( cd newlib && git rev-parse HEAD )  https://github.com/anza-xyz/newlib.git" >> version.md
 
-    build_newlib "v0"
-    build_newlib "v1"
-    build_newlib "v2"
     build_newlib "v3"
 fi
 
@@ -109,9 +107,6 @@ cp -R "rust/build/${HOST_TRIPLE}/stage1/bin" deploy/rust/
 cp -R "cargo/target/release/cargo${EXE_SUFFIX}" deploy/rust/bin/
 mkdir -p deploy/rust/lib/rustlib/
 cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/${HOST_TRIPLE}" deploy/rust/lib/rustlib/
-cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpf-solana-solana" deploy/rust/lib/rustlib/
-cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv1-solana-solana" deploy/rust/lib/rustlib/
-cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv2-solana-solana" deploy/rust/lib/rustlib/
 cp -R "rust/build/${HOST_TRIPLE}/stage1/lib/rustlib/sbpfv3-solana-solana" deploy/rust/lib/rustlib/
 find . -maxdepth 6 -type f -path "./rust/build/${HOST_TRIPLE}/stage1/lib/*" -exec cp {} deploy/rust/lib \;
 mkdir -p deploy/rust/lib/rustlib/src/rust
@@ -131,7 +126,7 @@ clang
 clang++
 clang-cl
 clang-cpp
-clang-22
+clang-17
 ld.lld
 ld64.lld
 llc
@@ -148,12 +143,7 @@ EOF
          )
 cp -R "rust/build/${HOST_TRIPLE}/llvm/build/lib/clang" deploy/llvm/lib/
 if [[ "${HOST_TRIPLE}" != "x86_64-pc-windows-msvc" ]] ; then
-    cp -R newlib_v0/sbf-solana/lib/lib{c,m}.a deploy/llvm/lib/
-    cp -R newlib_v0/sbf-solana/include deploy/llvm/
     
-    copy_newlib "v0"
-    copy_newlib "v1"
-    copy_newlib "v2"
     copy_newlib "v3"
 
     cp -R rust/src/llvm-project/lldb/scripts/solana/* deploy/llvm/bin/
