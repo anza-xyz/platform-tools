@@ -7,7 +7,7 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - name: Shell Check
       run: ./shellcheck.sh
       shell: bash
@@ -65,7 +65,7 @@ jobs:
           tar: windows
           out_dir: /c/out
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - name: Install coreutils and swig
       run: |
         brew update && brew install coreutils swig ninja
