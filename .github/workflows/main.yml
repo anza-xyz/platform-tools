@@ -55,15 +55,15 @@ jobs:
           rust: stable
           tar: osx
           out_dir: out
-        - target: x86_64-pc-windows-msvc
-          arch: x86_64
-          os: windows-latest
-          ninja_file: ninja-win.zip
-          ninja_dir: /usr/bin
-          ninja_sudo:
-          rust: stable
-          tar: windows
-          out_dir: /c/out
+        # - target: x86_64-pc-windows-msvc
+        #   arch: x86_64
+        #   os: windows-latest
+        #   ninja_file: ninja-win.zip
+        #   ninja_dir: /usr/bin
+        #   ninja_sudo:
+        #   rust: stable
+        #   tar: windows
+        #   out_dir: /c/out
     steps:
     - uses: actions/checkout@v1
     - name: Install coreutils and swig
@@ -89,7 +89,7 @@ jobs:
     - name: Install Rust
       uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: 1.95.0
+        toolchain: 1.84.1
     - name: Build
       run: ./build.sh ${{ matrix.out_dir }}
       shell: bash
@@ -121,10 +121,10 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: platform-tools-osx-x86_64.tar.bz2
-    - name: Download Windows tarball
-      uses: actions/download-artifact@v4
-      with:
-        name: platform-tools-windows-x86_64.tar.bz2
+    # - name: Download Windows tarball
+    #   uses: actions/download-artifact@v4
+    #   with:
+    #     name: platform-tools-windows-x86_64.tar.bz2
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -175,13 +175,13 @@ jobs:
         asset_path: platform-tools-osx-x86_64.tar.bz2
         asset_name: platform-tools-osx-x86_64.tar.bz2
         asset_content_type: application/zip
-    - name: Release Windows tarball
-      id: upload-release-windows
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: platform-tools-windows-x86_64.tar.bz2
-        asset_name: platform-tools-windows-x86_64.tar.bz2
-        asset_content_type: application/zip
+    # - name: Release Windows tarball
+    #   id: upload-release-windows
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: platform-tools-windows-x86_64.tar.bz2
+    #     asset_name: platform-tools-windows-x86_64.tar.bz2
+    #     asset_content_type: application/zip
