@@ -1,13 +1,29 @@
 name: CI
 
-on: [pull_request, push, workflow_dispatch]
+on:
+  pull_request:
+  push:
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit SHA to check and build
+        required: true
+        type: string
 
 jobs:
   check:
     name: Check
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        ref: ${{ inputs.ref || github.event.pull_request.head.sha || github.sha }}
+    - name: Resolve build commit
+      id: commit
+      run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      shell: bash
     - name: Shell Check
       run: ./shellcheck.sh
       shell: bash
@@ -65,7 +81,9 @@ jobs:
           tar: windows
           out_dir: /c/out
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        ref: ${{ needs.check.outputs.sha }}
     - name: Install coreutils and swig
       run: |
         brew update && brew install coreutils swig ninja
@@ -73,10 +91,11 @@ jobs:
       shell: bash
     - name: Install Linux tools for LLDB
       run: |
-        sudo apt-get install build-essential swig python3-dev libedit-dev libncurses5-dev libxml2-dev
+        sudo apt-get update
+        sudo apt-get install -y build-essential swig python3-dev libedit-dev libncurses5-dev libxml2-dev
       if: matrix.os == 'ubuntu-22.04'
     - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-space@main
+      uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
       if: matrix.os == 'ubuntu-22.04'
       with:
         tool-cache: false
@@ -87,101 +106,14 @@ jobs:
       if: matrix.tar != 'osx'
       shell: bash
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@master
+      uses: dtolnay/rust-toolchain@d1031067263f94b142dd6c0ce24c5eb9d02d52a0 # master
       with:
         toolchain: 1.95.0
     - name: Build
       run: ./build.sh ${{ matrix.out_dir }}
       shell: bash
     - name: Upload ${{ matrix.tar }} tarball
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: platform-tools-${{ matrix.tar }}-${{ matrix.arch }}.tar.bz2
         path: platform-tools-${{ matrix.tar }}-${{ matrix.arch }}.tar.bz2
-
-  release:
-    name: Upload Release Assets
-    needs: build
-    runs-on: ubuntu-latest
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-    steps:
-    - name: Download Linux x86 tarball
-      uses: actions/download-artifact@v4
-      with:
-        name: platform-tools-linux-x86_64.tar.bz2
-    - name: Download Linux ARM tarball
-      uses: actions/download-artifact@v4
-      with:
-        name: platform-tools-linux-aarch64.tar.bz2
-    - name: Download macOS ARM tarball
-      uses: actions/download-artifact@v4
-      with:
-        name: platform-tools-osx-aarch64.tar.bz2
-    - name: Download macOS x86 tarball
-      uses: actions/download-artifact@v4
-      with:
-        name: platform-tools-osx-x86_64.tar.bz2
-    - name: Download Windows tarball
-      uses: actions/download-artifact@v4
-      with:
-        name: platform-tools-windows-x86_64.tar.bz2
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-    - name: Release Linux x86 tarball
-      id: upload-release-linux-x86_64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: platform-tools-linux-x86_64.tar.bz2
-        asset_name: platform-tools-linux-x86_64.tar.bz2
-        asset_content_type: application/zip
-    - name: Release Linux ARM tarball
-      id: upload-release-linux-aarch64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: platform-tools-linux-aarch64.tar.bz2
-        asset_name: platform-tools-linux-aarch64.tar.bz2
-        asset_content_type: application/zip
-    - name: Release macOS ARM tarball
-      id: upload-release-macos-aarch64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: platform-tools-osx-aarch64.tar.bz2
-        asset_name: platform-tools-osx-aarch64.tar.bz2
-        asset_content_type: application/zip
-    - name: Release macOS x86 tarball
-      id: upload-release-macos-x86_64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: platform-tools-osx-x86_64.tar.bz2
-        asset_name: platform-tools-osx-x86_64.tar.bz2
-        asset_content_type: application/zip
-    - name: Release Windows tarball
-      id: upload-release-windows
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: platform-tools-windows-x86_64.tar.bz2
-        asset_name: platform-tools-windows-x86_64.tar.bz2
-        asset_content_type: application/zip
