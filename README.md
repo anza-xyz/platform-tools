@@ -73,3 +73,15 @@ v1.53 and onward ship the correct `sbpfv3-solana-solana` target. Use v1.53 or
 later to build SBPFv3 programs.
 
 [anza-xyz/rust]: https://github.com/anza-xyz/rust
+
+## C SDK deprecation
+
+For SBPFv3, Anza will no longer support C programs. Consequently, we will no longer release
+C SDK packages, and support SBPFv3 in our C Makefiles.
+
+The LLVM toolchain that we release periodically, however, can still be used to interact with 
+C packages, provided that Clang and LLD are invoked correctly and the proper 
+[SBPFv3 linker script](https://github.com/anza-xyz/rust/blob/3175de2636b6e1145b7655fd4131095e23452137/compiler/rustc_target/src/spec/base/sbf_base.rs#L34-L66) is passed to LLD.
+
+There are third party alternatives to Anza's C SDK, like [caravel](https://github.com/joeymeere/caravel) that 
+interacts with our compiler tooling in such a way.
