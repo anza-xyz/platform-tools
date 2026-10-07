@@ -62,15 +62,6 @@ jobs:
           rust: stable
           tar: osx
           out_dir: out
-        - target: x86_64-apple-darwin
-          arch: x86_64
-          os: macos-26-intel
-          ninja_file: ninja-mac.zip
-          ninja_dir: /usr/local/bin
-          ninja_sudo: sudo
-          rust: stable
-          tar: osx
-          out_dir: out
         - target: x86_64-pc-windows-msvc
           arch: x86_64
           os: windows-latest
